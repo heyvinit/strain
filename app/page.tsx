@@ -108,9 +108,8 @@ export default function Home() {
 
       {/* Header */}
       <header className="px-5 pt-10 pb-6 text-center border-b border-zinc-100 bg-white">
-        <div className="inline-flex items-center gap-2 mb-2">
-          <span className="text-2xl">🏃</span>
-          <h1 className="text-xl font-bold tracking-tight text-zinc-900">Strain</h1>
+        <div className="flex justify-center mb-3">
+          <img src="/strain-logo.svg" alt="Strain" className="h-7 w-auto" />
         </div>
         <p className="text-sm text-zinc-500 max-w-xs mx-auto leading-relaxed">
           Turn your official race results into a beautiful shareable card.
