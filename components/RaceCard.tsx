@@ -401,11 +401,30 @@ function MinimalTemplate({ data, style, dim }: { data: RaceData; style: CardStyl
   )
 }
 
+// ─── Background styles ─────────────────────────────────────────────────────────
+
+const BG_STYLES: Record<string, React.CSSProperties> = {
+  transparent: {
+    background: 'transparent',
+  },
+  blur: {
+    background: 'linear-gradient(135deg, rgba(10,10,18,0.72) 0%, rgba(20,20,35,0.68) 100%)',
+    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+    borderRadius: '20px',
+  },
+  glass: {
+    background: 'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%)',
+    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18), 0 8px 32px rgba(0,0,0,0.18)',
+    borderRadius: '20px',
+  },
+}
+
 // ─── Main export ───────────────────────────────────────────────────────────────
 
 export default function RaceCard({ data, style, cardRef }: RaceCardProps) {
   const font = FONTS[style.fontFamily]
   const dim = DIMS[style.layout]
+  const bgStyle = BG_STYLES[style.cardBg ?? 'transparent']
 
   const templateProps = { data, style, dim }
 
@@ -415,9 +434,9 @@ export default function RaceCard({ data, style, cardRef }: RaceCardProps) {
       id="race-card"
       style={{
         fontFamily: font,
-        background: 'transparent',
         display: 'inline-block',
         WebkitFontSmoothing: 'antialiased',
+        ...bgStyle,
       }}
     >
       {style.template === 'classic' && <ClassicTemplate {...templateProps} />}

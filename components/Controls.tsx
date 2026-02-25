@@ -215,6 +215,31 @@ export default function Controls({ style, onChange }: ControlsProps) {
         </div>
       </div>
 
+      {/* Card Background */}
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5">Background</p>
+        <div className="flex gap-2">
+          {([
+            { value: 'transparent', label: 'None', desc: 'Transparent' },
+            { value: 'blur',        label: 'Blur',  desc: 'Dark frosted' },
+            { value: 'glass',       label: 'Glass', desc: 'Glass effect' },
+          ] as const).map(b => (
+            <button
+              key={b.value}
+              onClick={() => set({ cardBg: b.value })}
+              className={`flex-1 py-2 rounded-lg border transition-colors ${
+                style.cardBg === b.value
+                  ? 'bg-white text-black border-white'
+                  : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
+              }`}
+            >
+              <div className="text-xs font-semibold">{b.label}</div>
+              <div className="text-[9px] opacity-50 mt-0.5">{b.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Race experience notes */}
       <NoteEditor style={style} set={set} />
 

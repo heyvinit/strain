@@ -17,9 +17,13 @@ const DEFAULT_STYLE: CardStyle = {
   layout: 'story',
   noteRaw: '',
   notes: [],
+  cardBg: 'transparent',
 }
 
 type AppState = 'idle' | 'loading' | 'success' | 'error'
+
+// Preview backdrop so the card is always visible regardless of bg style
+const PREVIEW_BACKDROP = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -28,7 +32,6 @@ export default function Home() {
   const [error, setError] = useState<{ message: string; hint?: string; isLeaderboard?: boolean } | null>(null)
   const [cardStyle, setCardStyle] = useState<CardStyle>(DEFAULT_STYLE)
   const [downloading, setDownloading] = useState(false)
-  const [previewBg, setPreviewBg] = useState<'dark' | 'light' | 'check'>('dark')
   const cardRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -96,6 +99,11 @@ export default function Home() {
     setUrl('')
   }
 
+  const downloadLabel =
+    cardStyle.cardBg === 'transparent' ? 'Download Transparent PNG'
+    : cardStyle.cardBg === 'blur' ? 'Download with Blur Background'
+    : 'Download with Glass Background'
+
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       {/* Header */}
@@ -105,7 +113,7 @@ export default function Home() {
           <h1 className="text-xl font-bold tracking-tight">Strain</h1>
         </div>
         <p className="text-sm text-zinc-400 max-w-xs mx-auto leading-relaxed">
-          Turn your official race results into a beautiful shareable card — with transparent background.
+          Turn your official race results into a beautiful shareable card.
         </p>
       </header>
 
@@ -196,46 +204,23 @@ export default function Home() {
 
             {/* Card preview */}
             <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">Preview</p>
-                {/* Background toggle */}
-                <div className="flex gap-1 bg-zinc-900 rounded-lg p-1">
-                  {([
-                    { key: 'dark',  label: 'Dark'  },
-                    { key: 'light', label: 'Light' },
-                    { key: 'check', label: '⊞'    },
-                  ] as const).map(b => (
-                    <button
-                      key={b.key}
-                      onClick={() => setPreviewBg(b.key)}
-                      className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
-                        previewBg === b.key ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
-                    >
-                      {b.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500 mb-2.5">Preview</p>
               <div
                 className="rounded-2xl overflow-hidden flex items-center justify-center"
                 style={{
-                  background:
-                    previewBg === 'check'
-                      ? 'repeating-conic-gradient(#2a2a2a 0% 25%, #1a1a1a 0% 50%) 0 0 / 20px 20px'
-                      : previewBg === 'dark'
-                      ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
-                      : 'linear-gradient(135deg, #e8e0d8 0%, #d4c5b5 50%, #c8b89a 100%)',
+                  background: PREVIEW_BACKDROP,
                   minHeight: cardStyle.layout === 'wide' ? '200px' : '320px',
                   padding: '16px',
                 }}
               >
                 <RaceCard data={raceData} style={cardStyle} cardRef={cardRef} />
               </div>
-
               <p className="text-[10px] text-zinc-600 mt-1.5 text-center">
-                {previewBg === 'check' ? 'Checkerboard = fully transparent' : 'Preview on simulated background'}
+                {cardStyle.cardBg === 'transparent'
+                  ? 'No background — transparent PNG'
+                  : cardStyle.cardBg === 'blur'
+                  ? 'Dark frosted background included in export'
+                  : 'Glass background included in export'}
               </p>
             </div>
 
@@ -270,7 +255,7 @@ export default function Home() {
               ) : (
                 <span className="flex items-center justify-center gap-2">
                   <DownloadIcon />
-                  Download Transparent PNG
+                  {downloadLabel}
                 </span>
               )}
             </button>

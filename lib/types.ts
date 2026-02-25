@@ -33,4 +33,5 @@ export interface CardStyle {
   layout: 'story' | 'square' | 'wide'
   noteRaw: string
   notes: string[]
+  cardBg: 'transparent' | 'blur' | 'glass'
 }
