@@ -22,8 +22,6 @@ const DEFAULT_STYLE: CardStyle = {
 
 type AppState = 'idle' | 'loading' | 'success' | 'error'
 
-// Preview backdrop so the card is always visible regardless of bg style
-const PREVIEW_BACKDROP = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -204,11 +202,32 @@ export default function Home() {
 
             {/* Card preview */}
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500 mb-2.5">Preview</p>
+              <div className="flex items-center justify-between mb-2.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">Preview</p>
+                {/* Background selector */}
+                <div className="flex gap-1 bg-zinc-900 rounded-lg p-1">
+                  {([
+                    { value: 'transparent', label: '⊞' },
+                    { value: 'blur',        label: 'Blur' },
+                    { value: 'glass',       label: 'Glass' },
+                  ] as const).map(b => (
+                    <button
+                      key={b.value}
+                      onClick={() => setCardStyle(s => ({ ...s, cardBg: b.value }))}
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
+                        cardStyle.cardBg === b.value ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      {b.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div
                 className="rounded-2xl overflow-hidden flex items-center justify-center"
                 style={{
-                  background: PREVIEW_BACKDROP,
+                  background: 'repeating-conic-gradient(#2a2a2a 0% 25%, #1a1a1a 0% 50%) 0 0 / 20px 20px',
                   minHeight: cardStyle.layout === 'wide' ? '200px' : '320px',
                   padding: '16px',
                 }}
