@@ -116,7 +116,7 @@ export default function Home() {
           {/* Headline */}
           <div className="text-center mb-8 max-w-xs">
             <h1 className="text-[1.85rem] font-bold leading-tight tracking-tight text-zinc-900 mb-3">
-              Your race,<br />beautifully shared.
+              Turn your race finish time into a shareable moment.
             </h1>
             <p className="text-zinc-400 text-sm leading-relaxed">
               Paste your official result link. Get a stunning shareable card in seconds.
