@@ -45,9 +45,10 @@ function extractLabelValuePairs($: CheerioAPI): Record<string, string> {
   return pairs
 }
 
-function classifyPairs(pairs: Record<string, string>): Partial<RaceData> {
+function classifyPairs(pairs: Record<string, string>): { data: Partial<RaceData>; netTimeLabeled: boolean } {
   const data: Partial<RaceData> = {}
   const allTimes: string[] = []
+  let netTimeLabeled = false
 
   for (const [label, value] of Object.entries(pairs)) {
     TIME_REGEX.lastIndex = 0
@@ -57,6 +58,7 @@ function classifyPairs(pairs: Record<string, string>): Partial<RaceData> {
     // Net/Chip time
     if (/net|chip|finish|result|zeit|temps|tiempo|tempo|official/.test(label) && TIME_REGEX.test(value)) {
       data.netTime = value.match(TIME_REGEX)?.[0] || value
+      netTimeLabeled = true
     }
     // Gun time
     if (/gun|gross|clock|wall/.test(label)) {
@@ -99,8 +101,10 @@ function classifyPairs(pairs: Record<string, string>): Partial<RaceData> {
     }
   }
 
-  if (!data.netTime && allTimes.length > 0) {
-    // Pick the largest time value as net time (usually the race time, not a split)
+  if (!data.netTime && allTimes.length > 0 && allTimes.length <= 3) {
+    // Only use the largest-time fallback when there are very few times (≤3).
+    // More times likely means a split table — the fallback would pick a split,
+    // not the actual finish time. Let AI handle it instead.
     const sorted = allTimes.sort((a, b) => {
       const toSecs = (t: string) => {
         const p = t.split(':').map(Number)
@@ -111,7 +115,7 @@ function classifyPairs(pairs: Record<string, string>): Partial<RaceData> {
     data.netTime = sorted[0]
   }
 
-  return data
+  return { data, netTimeLabeled }
 }
 
 function isLeaderboard($: CheerioAPI): boolean {
@@ -254,7 +258,7 @@ export async function parseGeneric($: CheerioAPI, url: string, rawHtml: string):
     // Step 3: Extract structured pairs and classify
     const pairs = extractLabelValuePairs($)
     console.log('[generic] Extracted pairs:', JSON.stringify(pairs, null, 2))
-    const classified = classifyPairs(pairs)
+    const { data: classified, netTimeLabeled } = classifyPairs(pairs)
 
     // Step 4: Runner name from heading if not found in pairs
     if (!classified.runnerName) {
@@ -280,8 +284,10 @@ export async function parseGeneric($: CheerioAPI, url: string, rawHtml: string):
 
     console.log('[generic] Classified data:', JSON.stringify(classified, null, 2))
 
-    // Step 6: Return if we have enough
-    if (classified.netTime) {
+    // Step 6: Return if we have enough — only when netTime was matched via a label.
+    // If it came from the "largest time" fallback, skip to AI which can read
+    // labelled fields like "OFFICIAL TIME" that the pair extractor may have missed.
+    if (classified.netTime && netTimeLabeled) {
       return {
         success: true,
         data: {
