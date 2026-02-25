@@ -213,7 +213,12 @@ export default function Home() {
                   ] as const).map(b => (
                     <button
                       key={b.value}
-                      onClick={() => setCardStyle(s => ({ ...s, cardBg: b.value }))}
+                      onClick={() => setCardStyle(s => ({
+                        ...s,
+                        cardBg: b.value,
+                        // blur is light background — switch to dark text automatically
+                        textColor: b.value === 'blur' ? '#111111' : s.textColor === '#111111' ? '#ffffff' : s.textColor,
+                      }))}
                       className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
                         cardStyle.cardBg === b.value ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'
                       }`}

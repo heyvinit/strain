@@ -402,29 +402,27 @@ function MinimalTemplate({ data, style, dim }: { data: RaceData; style: CardStyl
 }
 
 // ─── Background styles ─────────────────────────────────────────────────────────
+// NOTE: backdrop-filter doesn't render in html2canvas export.
+// These styles are tuned so the flat PNG looks correct when overlaid on a photo.
 
 const BG_STYLES: Record<string, React.CSSProperties> = {
   transparent: {
     background: 'transparent',
   },
-  // Frosted white — light semi-opaque background that looks like sandblasted glass
-  // backdrop-filter works in browser preview; exported PNG gets the flat tint
+  // Frosted / milky white — ~50% opaque so the photo shows through dimly
+  // Matches the sandblasted frosted card look in the reference
   blur: {
-    background: 'rgba(255, 255, 255, 0.20)',
-    backdropFilter: 'blur(28px) saturate(160%)',
-    WebkitBackdropFilter: 'blur(28px) saturate(160%)',
-    border: '1px solid rgba(255, 255, 255, 0.40)',
+    background: 'rgba(255, 255, 255, 0.50)',
+    border: '1px solid rgba(255, 255, 255, 0.60)',
     borderRadius: '20px',
-    boxShadow: '0 4px 32px rgba(0,0,0,0.12)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
   },
-  // Clear glass — nearly invisible, defined by its sharp bright edge
+  // Clear glass — very transparent (~10%) but defined by crisp bright edges
   glass: {
-    background: 'rgba(255, 255, 255, 0.07)',
-    backdropFilter: 'blur(14px)',
-    WebkitBackdropFilter: 'blur(14px)',
-    border: '1.5px solid rgba(255, 255, 255, 0.55)',
+    background: 'rgba(255, 255, 255, 0.10)',
+    border: '2px solid rgba(255, 255, 255, 0.70)',
     borderRadius: '20px',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 24px rgba(0,0,0,0.08)',
+    boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.50), 0 4px 20px rgba(0,0,0,0.06)',
   },
 }
 
