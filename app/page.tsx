@@ -104,103 +104,122 @@ export default function Home() {
     : 'Download with Glass Background'
 
   return (
-    <main className="min-h-screen bg-slate-50 text-zinc-900">
+    <main className="min-h-screen bg-white text-zinc-900">
 
-      {/* Header */}
-      <header className="px-5 pt-10 pb-6 text-center border-b border-zinc-100 bg-white">
-        <div className="flex justify-center mb-3">
-          <img src="/strain-logo.svg" alt="Strain" className="h-7 w-auto" />
-        </div>
-        <p className="text-sm text-zinc-500 max-w-xs mx-auto leading-relaxed">
-          Turn your official race results into a beautiful shareable card.
-        </p>
-      </header>
-
-      {/* ── Idle / Error state ── */}
+      {/* ── Idle / Error state: full-screen hero ── */}
       {state !== 'success' && (
-        <div className="px-4 py-10 max-w-md mx-auto">
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-3">
-              <label className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                Your race result link
-              </label>
-              <div className="flex flex-col gap-2">
+        <div className="min-h-screen flex flex-col items-center justify-center px-5 py-16">
+
+          {/* Logo */}
+          <img src="/strain-logo.svg" alt="Strain" className="h-8 w-auto mb-12" />
+
+          {/* Headline */}
+          <div className="text-center mb-8 max-w-xs">
+            <h1 className="text-[1.85rem] font-bold leading-tight tracking-tight text-zinc-900 mb-3">
+              Your race,<br />beautifully shared.
+            </h1>
+            <p className="text-zinc-400 text-sm leading-relaxed">
+              Paste your official result link. Get a stunning shareable card in seconds.
+            </p>
+          </div>
+
+          {/* Form */}
+          <div className="w-full max-w-md">
+            <form onSubmit={handleSubmit}>
+              <div className="relative mb-2">
                 <input
                   type="url"
                   value={url}
                   onChange={e => setUrl(e.target.value)}
-                  placeholder="https://results.example.com/race/123/runner/456"
-                  className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors shadow-sm"
+                  placeholder="Paste your race result link..."
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-4 py-4 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:bg-white transition-all shadow-sm pr-32"
                   disabled={state === 'loading'}
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
                 />
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Paste the link to{' '}
-                  <span className="text-zinc-600">your specific result</span> — not the full race leaderboard.
-                </p>
+                <button
+                  type="submit"
+                  disabled={state === 'loading' || !url.trim()}
+                  className="absolute right-2 top-2 bottom-2 px-4 bg-zinc-900 text-white font-semibold rounded-xl text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-700 transition-colors whitespace-nowrap"
+                >
+                  {state === 'loading' ? (
+                    <span className="flex items-center gap-1.5">
+                      <LoadingSpinner light />
+                      Loading
+                    </span>
+                  ) : (
+                    'Generate →'
+                  )}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={state === 'loading' || !url.trim()}
-                className="w-full bg-zinc-900 text-white font-semibold py-3.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-800 transition-colors"
-              >
-                {state === 'loading' ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <LoadingSpinner />
-                    Fetching your result...
-                  </span>
-                ) : (
-                  'Get My Race Stats'
-                )}
-              </button>
-            </div>
-          </form>
+              <p className="text-xs text-zinc-400 text-center leading-relaxed">
+                Paste your <span className="text-zinc-600">individual result</span> — not the full leaderboard
+              </p>
+            </form>
 
-          {/* Error */}
-          {state === 'error' && error && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
-              <div className="flex items-start gap-3">
-                <span className="text-red-400 text-lg mt-0.5">
-                  {error.isLeaderboard ? '🏁' : '⚠️'}
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm text-red-700 leading-relaxed font-medium">
-                    {error.isLeaderboard
-                      ? 'This is a full race leaderboard, not your individual result.'
-                      : error.message}
-                  </p>
-                  {error.isLeaderboard && (
-                    <p className="text-xs text-red-500 mt-2 leading-relaxed">
-                      Find your specific result — search by name or BIB — then paste that link here.
+            {/* Error */}
+            {state === 'error' && error && (
+              <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-red-400 text-lg mt-0.5">
+                    {error.isLeaderboard ? '🏁' : '⚠️'}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm text-red-700 leading-relaxed font-medium">
+                      {error.isLeaderboard
+                        ? 'This is a full race leaderboard, not your individual result.'
+                        : error.message}
                     </p>
-                  )}
-                  {error.hint && !error.isLeaderboard && (
-                    <p className="text-xs text-zinc-500 mt-2">{error.hint}</p>
-                  )}
+                    {error.isLeaderboard && (
+                      <p className="text-xs text-red-500 mt-2 leading-relaxed">
+                        Find your specific result — search by name or BIB — then paste that link here.
+                      </p>
+                    )}
+                    {error.hint && !error.isLeaderboard && (
+                      <p className="text-xs text-zinc-500 mt-2">{error.hint}</p>
+                    )}
+                  </div>
                 </div>
+                <button
+                  onClick={() => setState('idle')}
+                  className="mt-3 text-xs text-zinc-500 underline underline-offset-2"
+                >
+                  Try a different link
+                </button>
               </div>
-              <button
-                onClick={() => setState('idle')}
-                className="mt-3 text-xs text-zinc-500 underline underline-offset-2"
-              >
-                Try a different link
-              </button>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* How it works */}
+          <div className="grid grid-cols-3 gap-6 mt-14 max-w-sm w-full">
+            {([
+              { num: '01', text: 'Paste your race result link' },
+              { num: '02', text: 'Customize template & colors' },
+              { num: '03', text: 'Download & share anywhere' },
+            ]).map(step => (
+              <div key={step.num} className="text-center">
+                <div className="text-[10px] font-bold text-zinc-300 mb-1.5 tabular-nums">{step.num}</div>
+                <div className="text-[11px] text-zinc-400 leading-snug">{step.text}</div>
+              </div>
+            ))}
+          </div>
+
         </div>
       )}
 
       {/* ── Success state: desktop two-column, mobile stacked ── */}
       {state === 'success' && raceData && (
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors mb-5"
-          >
-            ← Try another result
-          </button>
+          <div className="flex items-center justify-between mb-5">
+            <img src="/strain-logo.svg" alt="Strain" className="h-6 w-auto" />
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+            >
+              ← New result
+            </button>
+          </div>
 
           <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
 
