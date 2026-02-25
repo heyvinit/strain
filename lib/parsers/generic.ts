@@ -42,6 +42,29 @@ function extractLabelValuePairs($: CheerioAPI): Record<string, string> {
     }
   )
 
+  // Sibling-based scan: handles flex/grid card layouts where label and value
+  // are separate child elements of a common parent, e.g.:
+  //   <div><span>OFFICIAL TIME</span><span>01:57:09</span></div>
+  const SIBLING_LABELS = /official[\s_]?time|net[\s_]?time|chip[\s_]?time|gun[\s_]?time|finish[\s_]?time|total[\s_]?time|avg[\s_]?pace|overall|position|rank|bib/i
+  $('*').each((_, container) => {
+    const kids = $(container).children().toArray()
+    if (kids.length < 2 || kids.length > 6) return
+    for (const kid of kids) {
+      const kidText = $(kid).text().trim()
+      if (!SIBLING_LABELS.test(kidText) || kidText.length > 50) continue
+      const label = kidText.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').trim()
+      if (pairs[label]) continue // already found via a more structured extractor
+      for (const sib of kids) {
+        if (sib === kid) continue
+        const val = $(sib).text().trim()
+        if (val.length > 0 && val.length < 80) {
+          pairs[label] = val
+          break
+        }
+      }
+    }
+  })
+
   return pairs
 }
 
@@ -101,10 +124,10 @@ function classifyPairs(pairs: Record<string, string>): { data: Partial<RaceData>
     }
   }
 
-  if (!data.netTime && allTimes.length > 0 && allTimes.length <= 3) {
-    // Only use the largest-time fallback when there are very few times (≤3).
-    // More times likely means a split table — the fallback would pick a split,
-    // not the actual finish time. Let AI handle it instead.
+  if (!data.netTime && allTimes.length > 0) {
+    // Pick the largest time value as net time (usually the race time, not a split).
+    // The sibling-based extractor above should catch labeled times first, so this
+    // fallback is only reached on pages with no recognizable labels.
     const sorted = allTimes.sort((a, b) => {
       const toSecs = (t: string) => {
         const p = t.split(':').map(Number)
