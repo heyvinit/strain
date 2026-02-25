@@ -70,17 +70,16 @@ export default function Home() {
     setDownloading(true)
     setDownloadError(null)
     try {
-      const html2canvas = (await import('html2canvas')).default
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: null,
-        scale: 3,
-        useCORS: true,
-        logging: false,
+      const { toPng } = await import('html-to-image')
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 3,
+        backgroundColor: 'transparent',
+        skipFonts: false,
       })
       const link = document.createElement('a')
       const raceName = raceData.raceName.replace(/[^a-z0-9]/gi, '-').toLowerCase().substring(0, 30)
       link.download = `strain-${raceName}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.href = dataUrl
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
