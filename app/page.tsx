@@ -29,7 +29,7 @@ export default function Home() {
   const [error, setError] = useState<{ message: string; hint?: string; isLeaderboard?: boolean } | null>(null)
   const [cardStyle, setCardStyle] = useState<CardStyle>(DEFAULT_STYLE)
   const [downloading, setDownloading] = useState(false)
-  const [downloadError, setDownloadError] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -68,7 +68,7 @@ export default function Home() {
   const handleDownload = useCallback(async () => {
     if (!cardRef.current || !raceData) return
     setDownloading(true)
-    setDownloadError(false)
+    setDownloadError(null)
     try {
       const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(cardRef.current, {
@@ -76,7 +76,6 @@ export default function Home() {
         scale: 3,
         useCORS: true,
         logging: false,
-        allowTaint: true,
       })
       const link = document.createElement('a')
       const raceName = raceData.raceName.replace(/[^a-z0-9]/gi, '-').toLowerCase().substring(0, 30)
@@ -87,7 +86,7 @@ export default function Home() {
       document.body.removeChild(link)
     } catch (err) {
       console.error('Download failed:', err)
-      setDownloadError(true)
+      setDownloadError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setDownloading(false)
     }
@@ -212,8 +211,8 @@ export default function Home() {
               <Controls style={cardStyle} onChange={setCardStyle} />
             </div>
 
-            {/* ── Right: Preview + Download (sticky on desktop) ── */}
-            <div className="lg:sticky lg:top-6 flex flex-col gap-3 lg:w-auto">
+            {/* ── Right: Preview + Download ── */}
+            <div className="flex flex-col gap-3 lg:w-auto">
               {/* Background selector */}
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Preview</p>
@@ -283,7 +282,7 @@ export default function Home() {
 
               {downloadError && (
                 <p className="text-[11px] text-red-500 text-center">
-                  Export failed — try refreshing the page and downloading again.
+                  Export failed: {downloadError}
                 </p>
               )}
 
