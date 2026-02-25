@@ -1,5 +1,12 @@
-import { CheerioAPI } from 'cheerio'
+import axios from 'axios'
 import { ScrapeResult } from '../types'
+
+const API_BASE = 'https://sportstimingsolutions.in/frontend/api'
+const HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
+  Referer: 'https://sportstimingsolutions.in/',
+  Origin: 'https://sportstimingsolutions.in',
+}
 
 const DISTANCE_MAP: Record<string, string> = {
   'marathon': '42.2 KM',
@@ -9,208 +16,127 @@ const DISTANCE_MAP: Record<string, string> = {
   'open 10k': '10 KM',
   '5k': '5 KM',
   'dream run': '6 KM',
+  '50 kms': '50 KM',
+  '35 kms': '35 KM',
+  '25 kms': '25 KM',
 }
 
 function resolveDistance(raw: string): string {
   const lower = raw.toLowerCase().trim()
-  // Check exact match first
   if (DISTANCE_MAP[lower]) return DISTANCE_MAP[lower]
-  // Check partial match
   for (const [key, val] of Object.entries(DISTANCE_MAP)) {
     if (lower.includes(key)) return val
   }
-  // If it already has "km" or "k" it's already a distance
   if (/\d+\.?\d*\s*(km|k)/i.test(raw)) return raw
-  return raw // return as-is (e.g., "Marathon")
+  return raw
 }
 
-// Extract race name from the base64-encoded `q` URL param: {"e_name":"Tata Mumbai Marathon 2026",...}
-function extractRaceNameFromUrl(url: string): string {
+// Decode the base64 `data` field returned by the API
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function decodeApiData(response: any): any {
+  if (response?.data && typeof response.data === 'string') {
+    try {
+      return JSON.parse(Buffer.from(response.data, 'base64').toString('utf-8'))
+    } catch { /* fall through */ }
+  }
+  return response
+}
+
+export async function parseSportstiming(url: string): Promise<ScrapeResult> {
+  // Decode the base64 q param to get event_id and bibNo
+  let eventId: string
+  let bibNo: string
+  let raceName = ''
+
   try {
     const urlObj = new URL(url)
     const q = urlObj.searchParams.get('q')
-    if (!q) return ''
-    const decoded = Buffer.from(decodeURIComponent(q), 'base64').toString('utf-8')
-    const parsed = JSON.parse(decoded)
-    return parsed.e_name || parsed.eventName || parsed.name || ''
+    if (!q) return { success: false, error: 'Missing q parameter in Sports Timing URL.' }
+    const decoded = JSON.parse(Buffer.from(decodeURIComponent(q), 'base64').toString('utf-8'))
+    eventId = String(decoded.e_id || decoded.eventId || '')
+    bibNo = String(decoded.bibNo || decoded.bib_no || decoded.bib || '')
+    raceName = decoded.e_name || decoded.eventName || ''
+    if (!eventId || !bibNo) return { success: false, error: 'Could not parse event ID or bib from URL.' }
   } catch {
-    return ''
+    return { success: false, error: 'Invalid Sports Timing Solutions URL format.' }
   }
-}
 
-function getTextLines($: CheerioAPI): string[] {
-  const lines: string[] = []
-  $('body *').each((_, el) => {
-    if ($(el).children().length === 0) {
-      const t = $(el).text().trim()
-      if (t.length >= 2 && t.length <= 200) lines.push(t)
-    }
-  })
-  return lines
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function findRunner(data: any): any {
-  if (!data || typeof data !== 'object') return null
-  // Direct runner object
-  const TIME_KEYS = ['finishTime', 'finish_time', 'netTime', 'net_time', 'chipTime', 'chip_time', 'time', 'gunTime']
-  const hasTime = TIME_KEYS.some(k => data[k])
-  const hasName = data.name || data.runnerName || data.runner_name || data.firstName || data.first_name
-  if (hasTime || hasName) return data
-  // Nested: data.data, data.runner, data.result, data.participant, data.response
-  for (const key of ['data', 'runner', 'result', 'participant', 'response', 'details']) {
-    const nested = data[key]
-    if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
-      const found = findRunner(nested)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseFromIntercepted(data: any, url: string): ScrapeResult | null {
   try {
-    const runner = findRunner(data)
-    if (!runner) return null
+    const res = await axios.get(
+      `${API_BASE}/event/bib/result?event_id=${eventId}&bibNo=${bibNo}`,
+      { headers: HEADERS, timeout: 15000 }
+    )
+    const data = decodeApiData(res.data)
 
-    const name = runner.name || runner.runnerName || runner.runner_name ||
-      [runner.firstName || runner.first_name, runner.lastName || runner.last_name].filter(Boolean).join(' ')
-    const netTime = runner.finishTime || runner.finish_time || runner.netTime ||
-      runner.net_time || runner.chipTime || runner.chip_time || runner.time || ''
-    if (!name && !netTime) return null
+    const event = data?.event || {}
+    const race = data?.race || {}
+    const participant = data?.participant || {}
+    const brackets: Array<Record<string, unknown>> = data?.brackets || []
 
-    const raceName = extractRaceNameFromUrl(url) || runner.eventName || runner.event_name || 'Race'
-    const bibNumber = String(runner.bibNo || runner.bib_no || runner.bib || runner.bibNumber || '')
-    const distance = resolveDistance(runner.category || runner.distance || runner.raceCategory || '')
-    const pace = runner.pace || runner.chipPace || runner.chip_pace || ''
-    const overallRank = runner.overallRank || runner.overall_rank || runner.overallPlace || ''
-    const overallTotal = runner.totalParticipants || runner.total_participants || ''
-    const overallPosition = overallRank
-      ? overallTotal ? `${overallRank} / ${overallTotal}` : String(overallRank)
+    const runnerName = String(
+      participant.full_name ||
+      [participant.first_name, participant.last_name].filter(Boolean).join(' ') ||
+      ''
+    ).trim()
+
+    // Overall bracket first
+    const overall = brackets.find((b) => String(b.bracket_name).toLowerCase() === 'overall') || brackets[0]
+    const netTime = String(overall?.finished_time || '').trim()
+    const gunTime = overall?.gun_time ? String(overall.gun_time).trim() : undefined
+
+    if (!runnerName && !netTime) {
+      return { success: false, error: 'Could not extract result data from Sports Timing Solutions.' }
+    }
+
+    // Gender/age bracket for category
+    const ageBracket = brackets.find((b) => /\d/.test(String(b.bracket_name)))
+    const genderBracket = brackets.find((b) =>
+      /^(male|female|men|women)$/i.test(String(b.bracket_name))
+    )
+    const category = ageBracket
+      ? String(ageBracket.bracket_name)
+      : genderBracket
+      ? String(genderBracket.bracket_name)
+      : participant.gender
+      ? participant.gender === 'M' ? 'Male' : 'Female'
       : undefined
-    const category = runner.categoryName || runner.category_name || runner.ageGroup || runner.age_group || runner.gender || undefined
+
+    const overallPosition = overall?.bracket_rank
+      ? overall.bracket_participants
+        ? `${overall.bracket_rank} / ${overall.bracket_participants}`
+        : String(overall.bracket_rank)
+      : undefined
+
+    const catBracket = ageBracket || genderBracket
+    const categoryPosition = catBracket?.bracket_rank
+      ? catBracket.bracket_participants
+        ? `${catBracket.bracket_rank} / ${catBracket.bracket_participants}`
+        : String(catBracket.bracket_rank)
+      : undefined
+
+    const distance = resolveDistance(race.name ? String(race.name) : raceName)
+    const raceDate = race.race_date
+      ? new Date(String(race.race_date)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : ''
 
     return {
       success: true,
       data: {
-        raceName,
-        raceDate: runner.eventDate || runner.event_date || '',
-        runnerName: String(name).trim(),
-        bibNumber,
-        distance,
-        netTime: String(netTime).trim(),
-        pace: pace ? String(pace).replace(/^00:0?/, '').replace(/^0(\d:)/, '$1') : undefined,
-        overallPosition,
-        category,
-        platform: 'Sports Timing Solutions',
-      },
-    }
-  } catch {
-    return null
-  }
-}
-
-export function parseSportstiming($: CheerioAPI, url: string, intercepted?: unknown): ScrapeResult {
-  // Prefer intercepted JSON — more reliable than DOM scraping
-  if (intercepted) {
-    const result = parseFromIntercepted(intercepted, url)
-    if (result) return result
-    console.log('[sportstiming] intercepted JSON did not yield useful data, falling back to DOM')
-  }
-
-  try {
-    const lines = getTextLines($)
-
-    // Race name from URL q param
-    const raceName = extractRaceNameFromUrl(url) || $('title').text().split('|')[0].trim()
-
-    // Find runner name: first all-caps line that looks like a full name (2+ words)
-    // It's preceded by initials (e.g. "VG") then the full name "VINIT GHELANI"
-    let runnerName = ''
-    let runnerIdx = -1
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
-      // Full name: all caps, 2–5 words, 5–50 chars
-      if (
-        /^[A-Z][A-Z\s]{4,49}$/.test(line) &&
-        line.trim().split(/\s+/).length >= 2 &&
-        !/^(BIB|MARATHON|TIMINGS|RANK|OVERALL|GENDER|SPLITS|SEARCH|SELECT|RESULTS|DETAILS|PHOTOS|SHARE|CERTIFICATE)/.test(line)
-      ) {
-        runnerName = line.trim()
-        runnerIdx = i
-        break
-      }
-    }
-
-    if (runnerIdx === -1) {
-      return { success: false, error: 'Could not find runner name on this page.' }
-    }
-
-    const rest = lines.slice(runnerIdx + 1)
-
-    // BIB — label "BIB No" followed by number
-    const bibIdx = rest.findIndex(l => /^bib\s*(no\.?|number)?$/i.test(l))
-    const bibNumber = bibIdx >= 0 ? rest[bibIdx + 1]?.replace(/\D/g, '') || '' : ''
-
-    // Distance/Category — first meaningful line after BIB
-    const distanceRaw = bibIdx >= 0 ? (rest[bibIdx + 2] || '') : ''
-    const distance = resolveDistance(distanceRaw)
-
-    // Finish time — label "Finish Time" followed by HH:MM:SS
-    const finishIdx = rest.findIndex(l => /finish\s*time/i.test(l))
-    const netTime = finishIdx >= 0 ? (rest[finishIdx + 1] || '') : ''
-
-    // Pace — label "Chip Pace" or "Net Pace" followed by MM:SS
-    const paceIdx = rest.findIndex(l => /pace/i.test(l))
-    const rawPace = paceIdx >= 0 ? (rest[paceIdx + 1] || '') : ''
-    // Clean "00:06:32" → "6:32" (remove leading zero hours)
-    const pace = rawPace.replace(/^00:0?/, '').replace(/^0(\d:)/, '$1')
-
-    // Overall rank — "Overall" label → rank → "OF XXXX"
-    const overallIdx = rest.findIndex(l => /^overall$/i.test(l))
-    const overallRank = overallIdx >= 0 ? rest[overallIdx + 1] || '' : ''
-    const overallTotal = overallIdx >= 0 ? rest[overallIdx + 2]?.replace(/^of\s*/i, '') || '' : ''
-    const overallPosition = overallRank
-      ? overallTotal
-        ? `${overallRank} / ${overallTotal}`
-        : overallRank
-      : undefined
-
-    // Category — last named category line (e.g. "25 to 29 yrs Male")
-    // It appears after gender rank block
-    const categoryIdx = rest.findIndex(l => /\d+\s*(to|yrs|&)/i.test(l))
-    const category = categoryIdx >= 0 ? rest[categoryIdx] : undefined
-
-    // Category rank
-    const catRank = categoryIdx >= 0 ? rest[categoryIdx + 1] || '' : ''
-    const catTotal = categoryIdx >= 0 ? rest[categoryIdx + 2]?.replace(/^of\s*/i, '') || '' : ''
-    const categoryPosition = catRank && /^\d+$/.test(catRank)
-      ? catTotal ? `${catRank} / ${catTotal}` : catRank
-      : undefined
-
-    if (!netTime) {
-      return { success: false, error: 'Could not extract finish time from this page.' }
-    }
-
-    return {
-      success: true,
-      data: {
-        raceName: raceName || 'Race',
-        raceDate: '',
+        raceName: event.name || raceName || 'Race',
+        raceDate,
         runnerName,
-        bibNumber,
+        bibNumber: String(participant.bibno || bibNo),
         distance,
         netTime,
-        pace: pace || undefined,
+        gunTime,
         overallPosition,
-        category: category || undefined,
+        category,
         categoryPosition,
         platform: 'Sports Timing Solutions',
       },
     }
   } catch (err) {
     console.error('[sportstiming parser error]', err)
-    return { success: false, error: 'Failed to parse Sports Timing Solutions page.' }
+    return { success: false, error: 'Failed to fetch Sports Timing Solutions result.' }
   }
 }

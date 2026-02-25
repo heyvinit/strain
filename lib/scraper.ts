@@ -6,6 +6,7 @@ import { parseRaceResult } from './parsers/raceresult'
 import { parseAthlinks } from './parsers/athlinks'
 import { parseIfinish } from './parsers/ifinish'
 import { parseSportstiming } from './parsers/sportstiming'
+
 import { parseGeneric } from './parsers/generic'
 import { parseNyrr } from './parsers/nyrr'
 
@@ -70,10 +71,10 @@ type Platform =
 const STATIC_PLATFORMS: Platform[] = ['webscorer', 'athlinks']
 
 // Platforms that are definitely JS-rendered SPAs — always use Puppeteer
-const JS_PLATFORMS: Platform[] = ['ifinish', 'sportstiming', 'raceresult']
+const JS_PLATFORMS: Platform[] = ['ifinish', 'raceresult']
 
 // Platforms handled via direct API calls (no HTML fetching needed)
-const API_PLATFORMS: Platform[] = ['nyrr']
+const API_PLATFORMS: Platform[] = ['nyrr', 'sportstiming']
 
 function detectPlatform(hostname: string): Platform {
   if (hostname.includes('webscorer.com')) return 'webscorer'
@@ -139,41 +140,6 @@ async function fetchWithPuppeteer(url: string): Promise<string> {
   }
 }
 
-// For sportstiming: intercept the XHR/fetch API response to get runner JSON directly
-async function fetchSportstimingData(url: string): Promise<{ html: string; intercepted: unknown }> {
-  const browser = await launchBrowser()
-  try {
-    const page = await browser.newPage()
-    await page.setUserAgent(HEADERS['User-Agent'])
-    await page.setViewport({ width: 390, height: 844 })
-
-    let intercepted: unknown = null
-    page.on('response', async (response) => {
-      const resUrl = response.url()
-      const ct = response.headers()['content-type'] || ''
-      if (resUrl.includes('sportstimingsolutions.in') && ct.includes('application/json')) {
-        console.log(`[sportstiming] intercepted response: ${resUrl}`)
-        try {
-          const json = await response.json()
-          // Pick the response most likely to contain runner data
-          if (json && (json.data || json.runner || json.result || json.name || json.finishTime || json.finish_time)) {
-            intercepted = json
-          } else if (!intercepted && json && typeof json === 'object') {
-            intercepted = json // take whatever we get
-          }
-        } catch { /* ignore */ }
-      }
-    })
-
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 })
-    await new Promise(r => setTimeout(r, 4000))
-    const html = await page.content()
-    console.log(`[sportstiming] intercepted=${!!intercepted} html=${html.length}`)
-    return { html, intercepted }
-  } finally {
-    await browser.close()
-  }
-}
 
 // Check if Axios HTML is clearly just a JS shell (fast sanity check)
 function looksLikeJsShell(html: string): boolean {
@@ -261,25 +227,8 @@ export async function scrapeRaceResult(url: string): Promise<ScrapeResult> {
     console.log(`[scraper] API platform (${platform}), skipping HTML fetch`)
     let result: ScrapeResult
     if (platform === 'nyrr') result = await parseNyrr(normalizedUrl)
+    else if (platform === 'sportstiming') result = await parseSportstiming(normalizedUrl)
     else result = { success: false, error: 'Unknown API platform.' }
-    if (result.success && result.data) result.data = cleanRaceData(result.data)
-    return result
-  }
-
-  // Sportstiming: use request interception to capture API JSON, fall back to DOM
-  if (platform === 'sportstiming') {
-    let intercepted: unknown = null
-    let html = ''
-    try {
-      const fetched = await fetchSportstimingData(normalizedUrl)
-      html = fetched.html
-      intercepted = fetched.intercepted
-    } catch (err: unknown) {
-      return { success: false, error: err instanceof Error ? err.message : 'Failed to fetch the page.' }
-    }
-    console.log(`[scraper] sportstiming intercepted=${!!intercepted} html=${html.length}`)
-    const $ = cheerio.load(html)
-    const result = parseSportstiming($, normalizedUrl, intercepted)
     if (result.success && result.data) result.data = cleanRaceData(result.data)
     return result
   }
