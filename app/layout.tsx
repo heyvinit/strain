@@ -7,7 +7,7 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-grote
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
-  title: 'RaceCard — Share Your Race Results',
+  title: 'Strain — Share Your Race Results',
   description:
     'Turn your official race results into a beautiful transparent PNG card. Strava-style stats for any race timing platform.',
 }

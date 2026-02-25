@@ -79,7 +79,7 @@ export default function Home() {
 
       const link = document.createElement('a')
       const raceName = raceData.raceName.replace(/[^a-z0-9]/gi, '-').toLowerCase().substring(0, 30)
-      link.download = `race-stats-${raceName}.png`
+      link.download = `strain-${raceName}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
     } catch (err) {
@@ -102,7 +102,7 @@ export default function Home() {
       <header className="px-5 pt-10 pb-6 text-center">
         <div className="inline-flex items-center gap-2 mb-3">
           <span className="text-2xl">🏃</span>
-          <h1 className="text-xl font-bold tracking-tight">RaceCard</h1>
+          <h1 className="text-xl font-bold tracking-tight">Strain</h1>
         </div>
         <p className="text-sm text-zinc-400 max-w-xs mx-auto leading-relaxed">
           Turn your official race results into a beautiful shareable card — with transparent background.
