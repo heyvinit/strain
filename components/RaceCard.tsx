@@ -407,15 +407,24 @@ const BG_STYLES: Record<string, React.CSSProperties> = {
   transparent: {
     background: 'transparent',
   },
+  // Frosted white — light semi-opaque background that looks like sandblasted glass
+  // backdrop-filter works in browser preview; exported PNG gets the flat tint
   blur: {
-    background: 'linear-gradient(135deg, rgba(10,10,18,0.72) 0%, rgba(20,20,35,0.68) 100%)',
-    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+    background: 'rgba(255, 255, 255, 0.20)',
+    backdropFilter: 'blur(28px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(28px) saturate(160%)',
+    border: '1px solid rgba(255, 255, 255, 0.40)',
     borderRadius: '20px',
+    boxShadow: '0 4px 32px rgba(0,0,0,0.12)',
   },
+  // Clear glass — nearly invisible, defined by its sharp bright edge
   glass: {
-    background: 'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%)',
-    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18), 0 8px 32px rgba(0,0,0,0.18)',
+    background: 'rgba(255, 255, 255, 0.07)',
+    backdropFilter: 'blur(14px)',
+    WebkitBackdropFilter: 'blur(14px)',
+    border: '1.5px solid rgba(255, 255, 255, 0.55)',
     borderRadius: '20px',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 24px rgba(0,0,0,0.08)',
   },
 }
 
