@@ -106,26 +106,27 @@ async function fetchWithAxios(url: string): Promise<string> {
   return response.data as string
 }
 
-async function fetchWithPuppeteer(url: string): Promise<string> {
+async function launchBrowser() {
   const isVercel = !!process.env.VERCEL
-
-  let browser
   if (isVercel) {
     const chromium = await import('@sparticuz/chromium')
     const puppeteer = await import('puppeteer-core')
-    browser = await puppeteer.default.launch({
+    return puppeteer.default.launch({
       args: chromium.default.args,
       executablePath: await chromium.default.executablePath(),
       headless: true,
     })
   } else {
     const puppeteer = await import('puppeteer')
-    browser = await puppeteer.default.launch({
+    return puppeteer.default.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
     })
   }
+}
 
+async function fetchWithPuppeteer(url: string): Promise<string> {
+  const browser = await launchBrowser()
   try {
     const page = await browser.newPage()
     await page.setUserAgent(HEADERS['User-Agent'])
@@ -133,6 +134,31 @@ async function fetchWithPuppeteer(url: string): Promise<string> {
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 })
     await new Promise(r => setTimeout(r, 2000))
     return await page.content()
+  } finally {
+    await browser.close()
+  }
+}
+
+// For sportstiming: intercept the XHR/fetch API response to get runner JSON directly
+async function fetchSportstimingData(url: string): Promise<{ html: string; intercepted: unknown }> {
+  const browser = await launchBrowser()
+  try {
+    const page = await browser.newPage()
+    await page.setUserAgent(HEADERS['User-Agent'])
+    await page.setViewport({ width: 390, height: 844 })
+
+    let intercepted: unknown = null
+    page.on('response', async (response) => {
+      const resUrl = response.url()
+      if (resUrl.includes('/frontend/api/') && resUrl.includes('bib')) {
+        try { intercepted = await response.json() } catch { /* ignore */ }
+      }
+    })
+
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 })
+    await new Promise(r => setTimeout(r, 3000))
+    const html = await page.content()
+    return { html, intercepted }
   } finally {
     await browser.close()
   }
@@ -229,6 +255,24 @@ export async function scrapeRaceResult(url: string): Promise<ScrapeResult> {
     return result
   }
 
+  // Sportstiming: use request interception to capture API JSON, fall back to DOM
+  if (platform === 'sportstiming') {
+    let intercepted: unknown = null
+    let html = ''
+    try {
+      const fetched = await fetchSportstimingData(normalizedUrl)
+      html = fetched.html
+      intercepted = fetched.intercepted
+    } catch (err: unknown) {
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to fetch the page.' }
+    }
+    console.log(`[scraper] sportstiming intercepted=${!!intercepted} html=${html.length}`)
+    const $ = cheerio.load(html)
+    const result = parseSportstiming($, normalizedUrl, intercepted)
+    if (result.success && result.data) result.data = cleanRaceData(result.data)
+    return result
+  }
+
   let html: string
   let usedPuppeteer = false
 
@@ -250,7 +294,6 @@ export async function scrapeRaceResult(url: string): Promise<ScrapeResult> {
     case 'raceresult':  result = parseRaceResult($, normalizedUrl); break
     case 'athlinks':    result = parseAthlinks($, normalizedUrl); break
     case 'ifinish':     result = parseIfinish($, normalizedUrl); break
-    case 'sportstiming': result = parseSportstiming($, normalizedUrl); break
     default:            result = await parseGeneric($, normalizedUrl, html)
   }
 

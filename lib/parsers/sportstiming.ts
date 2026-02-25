@@ -49,7 +49,58 @@ function getTextLines($: CheerioAPI): string[] {
   return lines
 }
 
-export function parseSportstiming($: CheerioAPI, url: string): ScrapeResult {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseFromIntercepted(data: any, url: string): ScrapeResult | null {
+  try {
+    // The API returns various shapes; try to extract runner fields
+    const runner = data?.data || data?.runner || data?.result || data?.participant || data
+    if (!runner || typeof runner !== 'object') return null
+
+    const name = runner.name || runner.runnerName || runner.runner_name ||
+      [runner.firstName || runner.first_name, runner.lastName || runner.last_name].filter(Boolean).join(' ')
+    const netTime = runner.finishTime || runner.finish_time || runner.netTime ||
+      runner.net_time || runner.chipTime || runner.chip_time || runner.time || ''
+    if (!name && !netTime) return null
+
+    const raceName = extractRaceNameFromUrl(url) || runner.eventName || runner.event_name || 'Race'
+    const bibNumber = String(runner.bibNo || runner.bib_no || runner.bib || runner.bibNumber || '')
+    const distance = resolveDistance(runner.category || runner.distance || runner.raceCategory || '')
+    const pace = runner.pace || runner.chipPace || runner.chip_pace || ''
+    const overallRank = runner.overallRank || runner.overall_rank || runner.overallPlace || ''
+    const overallTotal = runner.totalParticipants || runner.total_participants || ''
+    const overallPosition = overallRank
+      ? overallTotal ? `${overallRank} / ${overallTotal}` : String(overallRank)
+      : undefined
+    const category = runner.categoryName || runner.category_name || runner.ageGroup || runner.age_group || runner.gender || undefined
+
+    return {
+      success: true,
+      data: {
+        raceName,
+        raceDate: runner.eventDate || runner.event_date || '',
+        runnerName: String(name).trim(),
+        bibNumber,
+        distance,
+        netTime: String(netTime).trim(),
+        pace: pace ? String(pace).replace(/^00:0?/, '').replace(/^0(\d:)/, '$1') : undefined,
+        overallPosition,
+        category,
+        platform: 'Sports Timing Solutions',
+      },
+    }
+  } catch {
+    return null
+  }
+}
+
+export function parseSportstiming($: CheerioAPI, url: string, intercepted?: unknown): ScrapeResult {
+  // Prefer intercepted JSON — more reliable than DOM scraping
+  if (intercepted) {
+    const result = parseFromIntercepted(intercepted, url)
+    if (result) return result
+    console.log('[sportstiming] intercepted JSON did not yield useful data, falling back to DOM')
+  }
+
   try {
     const lines = getTextLines($)
 
