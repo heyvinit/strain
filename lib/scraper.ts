@@ -150,14 +150,25 @@ async function fetchSportstimingData(url: string): Promise<{ html: string; inter
     let intercepted: unknown = null
     page.on('response', async (response) => {
       const resUrl = response.url()
-      if (resUrl.includes('/frontend/api/') && resUrl.includes('bib')) {
-        try { intercepted = await response.json() } catch { /* ignore */ }
+      const ct = response.headers()['content-type'] || ''
+      if (resUrl.includes('sportstimingsolutions.in') && ct.includes('application/json')) {
+        console.log(`[sportstiming] intercepted response: ${resUrl}`)
+        try {
+          const json = await response.json()
+          // Pick the response most likely to contain runner data
+          if (json && (json.data || json.runner || json.result || json.name || json.finishTime || json.finish_time)) {
+            intercepted = json
+          } else if (!intercepted && json && typeof json === 'object') {
+            intercepted = json // take whatever we get
+          }
+        } catch { /* ignore */ }
       }
     })
 
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 })
-    await new Promise(r => setTimeout(r, 3000))
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 })
+    await new Promise(r => setTimeout(r, 4000))
     const html = await page.content()
+    console.log(`[sportstiming] intercepted=${!!intercepted} html=${html.length}`)
     return { html, intercepted }
   } finally {
     await browser.close()

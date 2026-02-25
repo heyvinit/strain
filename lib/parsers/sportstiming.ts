@@ -50,11 +50,29 @@ function getTextLines($: CheerioAPI): string[] {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function findRunner(data: any): any {
+  if (!data || typeof data !== 'object') return null
+  // Direct runner object
+  const TIME_KEYS = ['finishTime', 'finish_time', 'netTime', 'net_time', 'chipTime', 'chip_time', 'time', 'gunTime']
+  const hasTime = TIME_KEYS.some(k => data[k])
+  const hasName = data.name || data.runnerName || data.runner_name || data.firstName || data.first_name
+  if (hasTime || hasName) return data
+  // Nested: data.data, data.runner, data.result, data.participant, data.response
+  for (const key of ['data', 'runner', 'result', 'participant', 'response', 'details']) {
+    const nested = data[key]
+    if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+      const found = findRunner(nested)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseFromIntercepted(data: any, url: string): ScrapeResult | null {
   try {
-    // The API returns various shapes; try to extract runner fields
-    const runner = data?.data || data?.runner || data?.result || data?.participant || data
-    if (!runner || typeof runner !== 'object') return null
+    const runner = findRunner(data)
+    if (!runner) return null
 
     const name = runner.name || runner.runnerName || runner.runner_name ||
       [runner.firstName || runner.first_name, runner.lastName || runner.last_name].filter(Boolean).join(' ')
