@@ -101,17 +101,30 @@ async function fetchWithAxios(url: string): Promise<string> {
 }
 
 async function fetchWithPuppeteer(url: string): Promise<string> {
-  const puppeteer = await import('puppeteer')
-  const browser = await puppeteer.default.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
-  })
+  const isVercel = !!process.env.VERCEL
+
+  let browser
+  if (isVercel) {
+    const chromium = await import('@sparticuz/chromium')
+    const puppeteer = await import('puppeteer-core')
+    browser = await puppeteer.default.launch({
+      args: chromium.default.args,
+      executablePath: await chromium.default.executablePath(),
+      headless: true,
+    })
+  } else {
+    const puppeteer = await import('puppeteer')
+    browser = await puppeteer.default.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+    })
+  }
+
   try {
     const page = await browser.newPage()
     await page.setUserAgent(HEADERS['User-Agent'])
     await page.setViewport({ width: 390, height: 844 })
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 })
-    // Extra wait for late-loading data
     await new Promise(r => setTimeout(r, 2000))
     return await page.content()
   } finally {

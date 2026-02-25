@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { scrapeRaceResult } from '@/lib/scraper'
 
+export const maxDuration = 60
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
