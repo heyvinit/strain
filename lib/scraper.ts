@@ -7,6 +7,7 @@ import { parseAthlinks } from './parsers/athlinks'
 import { parseIfinish } from './parsers/ifinish'
 import { parseSportstiming } from './parsers/sportstiming'
 import { parseGeneric } from './parsers/generic'
+import { parseNyrr } from './parsers/nyrr'
 
 // ─── Field cleaners ───────────────────────────────────────────────────────────
 
@@ -62,6 +63,7 @@ type Platform =
   | 'athlinks'
   | 'ifinish'
   | 'sportstiming'
+  | 'nyrr'
   | 'generic'
 
 // Platforms whose static HTML already has all data (Axios is fine, fast)
@@ -70,12 +72,16 @@ const STATIC_PLATFORMS: Platform[] = ['webscorer', 'athlinks']
 // Platforms that are definitely JS-rendered SPAs — always use Puppeteer
 const JS_PLATFORMS: Platform[] = ['ifinish', 'sportstiming', 'raceresult']
 
+// Platforms handled via direct API calls (no HTML fetching needed)
+const API_PLATFORMS: Platform[] = ['nyrr']
+
 function detectPlatform(hostname: string): Platform {
   if (hostname.includes('webscorer.com')) return 'webscorer'
   if (hostname.includes('raceresult.com')) return 'raceresult'
   if (hostname.includes('athlinks.com')) return 'athlinks'
   if (hostname.includes('ifinish.in')) return 'ifinish'
   if (hostname.includes('sportstimingsolutions.in')) return 'sportstiming'
+  if (hostname.includes('nyrr.org')) return 'nyrr'
   return 'generic'
 }
 
@@ -212,6 +218,16 @@ export async function scrapeRaceResult(url: string): Promise<ScrapeResult> {
 
   const hostname = urlObj.hostname.toLowerCase()
   const platform = detectPlatform(hostname)
+
+  // API-based platforms: call their API directly, no HTML fetching needed
+  if (API_PLATFORMS.includes(platform)) {
+    console.log(`[scraper] API platform (${platform}), skipping HTML fetch`)
+    let result: ScrapeResult
+    if (platform === 'nyrr') result = await parseNyrr(normalizedUrl)
+    else result = { success: false, error: 'Unknown API platform.' }
+    if (result.success && result.data) result.data = cleanRaceData(result.data)
+    return result
+  }
 
   let html: string
   let usedPuppeteer = false
