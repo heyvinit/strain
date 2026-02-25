@@ -22,7 +22,6 @@ const DEFAULT_STYLE: CardStyle = {
 
 type AppState = 'idle' | 'loading' | 'success' | 'error'
 
-
 export default function Home() {
   const [url, setUrl] = useState('')
   const [state, setState] = useState<AppState>('idle')
@@ -68,7 +67,6 @@ export default function Home() {
   const handleDownload = useCallback(async () => {
     if (!cardRef.current || !raceData) return
     setDownloading(true)
-
     try {
       const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(cardRef.current, {
@@ -77,7 +75,6 @@ export default function Home() {
         useCORS: true,
         logging: false,
       })
-
       const link = document.createElement('a')
       const raceName = raceData.raceName.replace(/[^a-z0-9]/gi, '-').toLowerCase().substring(0, 30)
       link.download = `strain-${raceName}.png`
@@ -103,22 +100,23 @@ export default function Home() {
     : 'Download with Glass Background'
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-slate-50 text-zinc-900">
+
       {/* Header */}
-      <header className="px-5 pt-10 pb-6 text-center">
-        <div className="inline-flex items-center gap-2 mb-3">
+      <header className="px-5 pt-10 pb-6 text-center border-b border-zinc-100 bg-white">
+        <div className="inline-flex items-center gap-2 mb-2">
           <span className="text-2xl">🏃</span>
-          <h1 className="text-xl font-bold tracking-tight">Strain</h1>
+          <h1 className="text-xl font-bold tracking-tight text-zinc-900">Strain</h1>
         </div>
-        <p className="text-sm text-zinc-400 max-w-xs mx-auto leading-relaxed">
+        <p className="text-sm text-zinc-500 max-w-xs mx-auto leading-relaxed">
           Turn your official race results into a beautiful shareable card.
         </p>
       </header>
 
-      <div className="px-4 pb-24 max-w-lg mx-auto">
-        {/* URL Input */}
-        {state !== 'success' && (
-          <form onSubmit={handleSubmit} className="mt-2">
+      {/* ── Idle / Error state ── */}
+      {state !== 'success' && (
+        <div className="px-4 py-10 max-w-md mx-auto">
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-3">
               <label className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
                 Your race result link
@@ -129,21 +127,21 @@ export default function Home() {
                   value={url}
                   onChange={e => setUrl(e.target.value)}
                   placeholder="https://results.example.com/race/123/runner/456"
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-400 transition-colors"
+                  className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors shadow-sm"
                   disabled={state === 'loading'}
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
                 />
-                <p className="text-xs text-zinc-600 leading-relaxed">
+                <p className="text-xs text-zinc-400 leading-relaxed">
                   Paste the link to{' '}
-                  <span className="text-zinc-400">your specific result</span> — not the full race leaderboard.
+                  <span className="text-zinc-600">your specific result</span> — not the full race leaderboard.
                 </p>
               </div>
               <button
                 type="submit"
                 disabled={state === 'loading' || !url.trim()}
-                className="w-full bg-white text-black font-semibold py-3.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-100 transition-colors"
+                className="w-full bg-zinc-900 text-white font-semibold py-3.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-800 transition-colors"
               >
                 {state === 'loading' ? (
                   <span className="flex items-center justify-center gap-2">
@@ -156,56 +154,64 @@ export default function Home() {
               </button>
             </div>
           </form>
-        )}
 
-        {/* Error State */}
-        {state === 'error' && error && (
-          <div className="mt-4 rounded-xl border border-red-900 bg-red-950/40 p-4">
-            <div className="flex items-start gap-3">
-              <span className="text-red-400 text-lg mt-0.5">
-                {error.isLeaderboard ? '🏁' : '⚠️'}
-              </span>
-              <div className="flex-1">
-                <p className="text-sm text-red-300 leading-relaxed font-medium">
-                  {error.isLeaderboard
-                    ? 'This is a full race leaderboard, not your individual result.'
-                    : error.message}
-                </p>
-                {error.isLeaderboard && (
-                  <p className="text-xs text-red-400/80 mt-2 leading-relaxed">
-                    Please find your specific result on the race website — search for your name or BIB number — then copy that individual result link and paste it here.
+          {/* Error */}
+          {state === 'error' && error && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-red-400 text-lg mt-0.5">
+                  {error.isLeaderboard ? '🏁' : '⚠️'}
+                </span>
+                <div className="flex-1">
+                  <p className="text-sm text-red-700 leading-relaxed font-medium">
+                    {error.isLeaderboard
+                      ? 'This is a full race leaderboard, not your individual result.'
+                      : error.message}
                   </p>
-                )}
-                {error.hint && !error.isLeaderboard && (
-                  <p className="text-xs text-zinc-400 mt-2">{error.hint}</p>
-                )}
+                  {error.isLeaderboard && (
+                    <p className="text-xs text-red-500 mt-2 leading-relaxed">
+                      Find your specific result — search by name or BIB — then paste that link here.
+                    </p>
+                  )}
+                  {error.hint && !error.isLeaderboard && (
+                    <p className="text-xs text-zinc-500 mt-2">{error.hint}</p>
+                  )}
+                </div>
               </div>
+              <button
+                onClick={() => setState('idle')}
+                className="mt-3 text-xs text-zinc-500 underline underline-offset-2"
+              >
+                Try a different link
+              </button>
             </div>
-            <button
-              onClick={() => setState('idle')}
-              className="mt-3 text-xs text-zinc-400 underline underline-offset-2"
-            >
-              Try a different link
-            </button>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Success: Card + Controls */}
-        {state === 'success' && raceData && (
-          <div className="mt-2 flex flex-col gap-6">
-            <button
-              onClick={handleReset}
-              className="self-start flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
-            >
-              ← Try another result
-            </button>
+      {/* ── Success state: desktop two-column, mobile stacked ── */}
+      {state === 'success' && raceData && (
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors mb-5"
+          >
+            ← Try another result
+          </button>
 
-            {/* Card preview */}
-            <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">Preview</p>
-                {/* Background selector */}
-                <div className="flex gap-1 bg-zinc-900 rounded-lg p-1">
+          <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+
+            {/* ── Left: Editor / Controls ── */}
+            <div className="flex-1 min-w-0 bg-white rounded-2xl border border-zinc-100 shadow-sm p-5">
+              <Controls style={cardStyle} onChange={setCardStyle} />
+            </div>
+
+            {/* ── Right: Preview + Download (sticky on desktop) ── */}
+            <div className="lg:sticky lg:top-6 flex flex-col gap-3 lg:w-auto">
+              {/* Background selector */}
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Preview</p>
+                <div className="flex gap-1 bg-zinc-100 rounded-lg p-1">
                   {([
                     { value: 'transparent', label: '⊞' },
                     { value: 'blur',        label: 'Blur' },
@@ -216,11 +222,12 @@ export default function Home() {
                       onClick={() => setCardStyle(s => ({
                         ...s,
                         cardBg: b.value,
-                        // blur is light background — switch to dark text automatically
                         textColor: b.value === 'blur' ? '#111111' : s.textColor === '#111111' ? '#ffffff' : s.textColor,
                       }))}
                       className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
-                        cardStyle.cardBg === b.value ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'
+                        cardStyle.cardBg === b.value
+                          ? 'bg-white text-zinc-900 shadow-sm'
+                          : 'text-zinc-400 hover:text-zinc-600'
                       }`}
                     >
                       {b.label}
@@ -229,60 +236,52 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Card preview */}
               <div
                 className="rounded-2xl overflow-hidden flex items-center justify-center"
                 style={{
-                  background: 'repeating-conic-gradient(#2a2a2a 0% 25%, #1a1a1a 0% 50%) 0 0 / 20px 20px',
+                  background: 'repeating-conic-gradient(#d4d4d4 0% 25%, #e8e8e8 0% 50%) 0 0 / 20px 20px',
                   minHeight: cardStyle.layout === 'wide' ? '200px' : '320px',
                   padding: '16px',
                 }}
               >
                 <RaceCard data={raceData} style={cardStyle} cardRef={cardRef} />
               </div>
-              <p className="text-[10px] text-zinc-600 mt-1.5 text-center">
+
+              <p className="text-[10px] text-zinc-400 text-center">
                 {cardStyle.cardBg === 'transparent'
                   ? 'No background — transparent PNG'
                   : cardStyle.cardBg === 'blur'
-                  ? 'Dark frosted background included in export'
+                  ? 'Frosted background included in export'
                   : 'Glass background included in export'}
               </p>
-            </div>
 
-            {/* Customization */}
-            <div className="bg-zinc-900 rounded-2xl p-4">
-              <Controls style={cardStyle} onChange={setCardStyle} />
-            </div>
+              {/* Download button */}
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="w-full bg-zinc-900 text-white font-bold py-4 rounded-2xl text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-800 active:scale-[0.98] transition-all shadow-sm mt-1"
+              >
+                {downloading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <LoadingSpinner />
+                    Exporting...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <DownloadIcon />
+                    {downloadLabel}
+                  </span>
+                )}
+              </button>
 
-            {raceData.platform && (
-              <p className="text-xs text-zinc-600 text-center">
-                Data sourced via <span className="text-zinc-400">{raceData.platform}</span>
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Sticky Download Button */}
-      {state === 'success' && raceData && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent">
-          <div className="max-w-lg mx-auto">
-            <button
-              onClick={handleDownload}
-              disabled={downloading}
-              className="w-full bg-white text-black font-bold py-4 rounded-2xl text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-100 active:scale-[0.98] transition-all shadow-2xl"
-            >
-              {downloading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <LoadingSpinner dark />
-                  Exporting...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <DownloadIcon />
-                  {downloadLabel}
-                </span>
+              {raceData.platform && (
+                <p className="text-[10px] text-zinc-400 text-center">
+                  Data via <span className="text-zinc-500">{raceData.platform}</span>
+                </p>
               )}
-            </button>
+            </div>
+
           </div>
         </div>
       )}
@@ -293,7 +292,7 @@ export default function Home() {
 function LoadingSpinner({ dark = false }: { dark?: boolean }) {
   return (
     <svg
-      className={`animate-spin h-4 w-4 ${dark ? 'text-black' : 'text-zinc-600'}`}
+      className={`animate-spin h-4 w-4 ${dark ? 'text-white' : 'text-zinc-400'}`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

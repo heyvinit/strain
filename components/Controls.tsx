@@ -85,6 +85,8 @@ const TOGGLES: { label: string; key: keyof Pick<CardStyle, 'showBib' | 'showPosi
   { label: 'Shadow',   key: 'textShadow'   },
 ]
 
+const LABEL = 'text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5'
+
 export default function Controls({ style, onChange }: ControlsProps) {
   const set = (patch: Partial<CardStyle>) => onChange({ ...style, ...patch })
 
@@ -93,7 +95,7 @@ export default function Controls({ style, onChange }: ControlsProps) {
 
       {/* Template */}
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5">Template</p>
+        <p className={LABEL}>Template</p>
         <div className="grid grid-cols-3 gap-2">
           {TEMPLATES.map(t => (
             <button
@@ -101,14 +103,14 @@ export default function Controls({ style, onChange }: ControlsProps) {
               onClick={() => set({ template: t.value })}
               className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
                 style.template === t.value
-                  ? 'border-white bg-white/10'
-                  : 'border-zinc-700 hover:border-zinc-500'
+                  ? 'border-zinc-900 bg-zinc-900/5'
+                  : 'border-zinc-200 hover:border-zinc-400'
               }`}
             >
-              <div className={`w-10 h-12 ${style.template === t.value ? 'text-white' : 'text-zinc-500'}`}>
+              <div className={`w-10 h-12 ${style.template === t.value ? 'text-zinc-900' : 'text-zinc-300'}`}>
                 {t.thumb}
               </div>
-              <span className={`text-[10px] font-semibold ${style.template === t.value ? 'text-white' : 'text-zinc-500'}`}>
+              <span className={`text-[10px] font-semibold ${style.template === t.value ? 'text-zinc-900' : 'text-zinc-400'}`}>
                 {t.label}
               </span>
             </button>
@@ -118,7 +120,7 @@ export default function Controls({ style, onChange }: ControlsProps) {
 
       {/* Color */}
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5">Text Color</p>
+        <p className={LABEL}>Text Color</p>
         <div className="flex gap-2 flex-wrap items-center">
           {COLOR_PRESETS.map(c => (
             <button
@@ -128,14 +130,15 @@ export default function Controls({ style, onChange }: ControlsProps) {
               style={{ backgroundColor: c.value }}
               className={`w-8 h-8 rounded-full border-2 transition-transform active:scale-95 ${
                 style.textColor === c.value
-                  ? 'border-blue-400 scale-110'
-                  : 'border-zinc-600 hover:scale-105'
+                  ? 'border-blue-500 scale-110'
+                  : 'border-zinc-300 hover:scale-105'
               }`}
             />
           ))}
-          {/* Custom color swatch */}
-          <div className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer border-2 border-zinc-600 hover:scale-105 transition-transform"
-            style={{ background: 'conic-gradient(red,yellow,lime,aqua,blue,magenta,red)' }}>
+          <div
+            className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer border-2 border-zinc-300 hover:scale-105 transition-transform"
+            style={{ background: 'conic-gradient(red,yellow,lime,aqua,blue,magenta,red)' }}
+          >
             <input
               type="color"
               value={style.textColor}
@@ -148,7 +151,7 @@ export default function Controls({ style, onChange }: ControlsProps) {
 
       {/* Font */}
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5">Font</p>
+        <p className={LABEL}>Font</p>
         <div className="flex gap-2">
           {FONTS.map(f => (
             <button
@@ -156,8 +159,8 @@ export default function Controls({ style, onChange }: ControlsProps) {
               onClick={() => set({ fontFamily: f.value })}
               className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-colors ${
                 style.fontFamily === f.value
-                  ? 'bg-white text-black border-white'
-                  : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                  ? 'bg-zinc-900 text-white border-zinc-900'
+                  : 'bg-transparent text-zinc-500 border-zinc-200 hover:border-zinc-400'
               }`}
               style={{
                 fontFamily: f.value === 'grotesk' ? "'Space Grotesk'" : f.value === 'mono' ? "'Space Mono'" : 'Inter',
@@ -169,14 +172,14 @@ export default function Controls({ style, onChange }: ControlsProps) {
         </div>
         <div className="flex gap-2 mt-1">
           {FONTS.map(f => (
-            <span key={f.value} className="flex-1 text-center text-[9px] text-zinc-600">{f.label}</span>
+            <span key={f.value} className="flex-1 text-center text-[9px] text-zinc-400">{f.label}</span>
           ))}
         </div>
       </div>
 
       {/* Layout */}
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5">Layout</p>
+        <p className={LABEL}>Layout</p>
         <div className="flex gap-2">
           {LAYOUTS.map(l => (
             <button
@@ -184,8 +187,8 @@ export default function Controls({ style, onChange }: ControlsProps) {
               onClick={() => set({ layout: l.value })}
               className={`flex-1 py-2 rounded-lg border transition-colors ${
                 style.layout === l.value
-                  ? 'bg-white text-black border-white'
-                  : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                  ? 'bg-zinc-900 text-white border-zinc-900'
+                  : 'bg-transparent text-zinc-500 border-zinc-200 hover:border-zinc-400'
               }`}
             >
               <div className="text-xs font-semibold">{l.label}</div>
@@ -197,7 +200,7 @@ export default function Controls({ style, onChange }: ControlsProps) {
 
       {/* Show / Hide toggles */}
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 mb-2.5">Show Fields</p>
+        <p className={LABEL}>Show Fields</p>
         <div className="flex flex-wrap gap-1.5">
           {TOGGLES.map(t => (
             <button
@@ -205,8 +208,8 @@ export default function Controls({ style, onChange }: ControlsProps) {
               onClick={() => set({ [t.key]: !style[t.key] })}
               className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-colors ${
                 style[t.key]
-                  ? 'bg-white/10 text-white border-white/30'
-                  : 'bg-transparent text-zinc-600 border-zinc-800 hover:border-zinc-600'
+                  ? 'bg-zinc-900 text-white border-zinc-900'
+                  : 'bg-transparent text-zinc-400 border-zinc-200 hover:border-zinc-400'
               }`}
             >
               {t.label}
@@ -215,7 +218,7 @@ export default function Controls({ style, onChange }: ControlsProps) {
         </div>
       </div>
 
-      {/* Race experience notes */}
+      {/* Race note */}
       <NoteEditor style={style} set={set} />
 
     </div>
@@ -238,11 +241,8 @@ function NoteEditor({ style, set }: { style: CardStyle; set: (patch: Partial<Car
 
   const toggleNote = (sentence: string) => {
     const active = new Set(style.notes)
-    if (active.has(sentence)) {
-      active.delete(sentence)
-    } else {
-      active.add(sentence)
-    }
+    if (active.has(sentence)) active.delete(sentence)
+    else active.add(sentence)
     set({ notes: Array.from(active) })
   }
 
@@ -256,7 +256,7 @@ function NoteEditor({ style, set }: { style: CardStyle; set: (patch: Partial<Car
         onChange={handleNoteChange}
         placeholder="Describe your race... (e.g. First half marathon! Ran through the rain. Finished strong.)"
         rows={3}
-        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors resize-none leading-relaxed"
+        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2.5 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors resize-none leading-relaxed"
       />
       {sentences.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
@@ -268,8 +268,8 @@ function NoteEditor({ style, set }: { style: CardStyle; set: (patch: Partial<Car
                 onClick={() => toggleNote(s)}
                 className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-colors leading-snug text-left ${
                   active
-                    ? 'bg-white/10 text-white border-white/25'
-                    : 'bg-transparent text-zinc-600 border-zinc-800 hover:border-zinc-600'
+                    ? 'bg-zinc-900 text-white border-zinc-900'
+                    : 'bg-transparent text-zinc-400 border-zinc-200 hover:border-zinc-400'
                 }`}
               >
                 {s}
