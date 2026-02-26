@@ -147,7 +147,7 @@ function isLeaderboard($: CheerioAPI): boolean {
   $('table').each((_, table) => {
     const headerText = $(table).find('thead th, thead td').map((_, el) => $(el).text().trim().toLowerCase()).toArray().join(' ')
     if (/split|location|checkpoint|segment|lap/.test(headerText)) {
-      $(table).find('tbody').each((_, tbody) => splitsTbodies.add(tbody))
+      $(table).find('tbody').each((_, tbody) => { splitsTbodies.add(tbody) })
     }
   })
 
