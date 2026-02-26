@@ -165,7 +165,7 @@ function isLeaderboard($: CheerioAPI): boolean {
 function extractCleanText($: CheerioAPI): string {
   // Clone and strip noise
   const $clone = $
-  $clone('nav, footer, header, script, style, .nav, .footer, .header, .menu, .sidebar, .ad, .cookie, .social, .share, iframe').remove()
+  $clone('nav, footer, header, script, style, select, option, .nav, .footer, .header, .menu, .sidebar, .ad, .cookie, .social, .share, .modal, iframe').remove()
 
   // Get structured text — preserve newlines between elements
   const lines: string[] = []
