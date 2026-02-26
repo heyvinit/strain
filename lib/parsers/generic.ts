@@ -142,9 +142,19 @@ function classifyPairs(pairs: Record<string, string>): { data: Partial<RaceData>
 }
 
 function isLeaderboard($: CheerioAPI): boolean {
-  // Count rows that contain a time pattern
+  // Identify splits/checkpoint tables (individual result pages) — skip their rows
+  const splitsTbodies = new Set<unknown>()
+  $('table').each((_, table) => {
+    const headerText = $(table).find('thead th, thead td').map((_, el) => $(el).text().trim().toLowerCase()).toArray().join(' ')
+    if (/split|location|checkpoint|segment|lap/.test(headerText)) {
+      $(table).find('tbody').each((_, tbody) => splitsTbodies.add(tbody))
+    }
+  })
+
+  // Count rows that contain a time pattern, excluding splits tables
   let timeRowCount = 0
   $('table tbody tr, [class*="result-row"], [class*="runner-row"]').each((_, el) => {
+    if (splitsTbodies.has($(el).parent()[0])) return
     TIME_REGEX.lastIndex = 0
     if (TIME_REGEX.test($(el).text())) timeRowCount++
   })
