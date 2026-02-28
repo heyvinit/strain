@@ -159,9 +159,9 @@ function PassportCard({
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3 mb-5">
           {[
-            { label: 'RACES', value: String(stats.totalRaces) },
-            { label: 'DISTANCE', value: `${stats.totalKm} km` },
-            { label: 'ACTIVE YRS', value: '2026' },
+            { label: 'TOTAL RACES', value: String(stats.totalRaces + upcoming.length) },
+            { label: 'COMPLETED', value: String(stats.totalRaces) },
+            { label: 'KM RAN', value: String(stats.totalKm) },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-2xl p-3" style={{ background: '#1a1a1a' }}>
               <p className="text-[9px] font-bold tracking-widest mb-1" style={{ color: '#555' }}>{label}</p>
