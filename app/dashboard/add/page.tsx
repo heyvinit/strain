@@ -42,6 +42,7 @@ export default function AddRacePage() {
   const [mode, setMode] = useState<Mode>('url')
 
   // Manual form
+  const [manualStatus, setManualStatus] = useState<'completed' | 'upcoming'>('completed')
   const [manual, setManual] = useState({
     raceName: '',
     raceDate: '',
@@ -106,8 +107,9 @@ export default function AddRacePage() {
 
   async function handleManualSave(e: React.FormEvent) {
     e.preventDefault()
-    if (!manual.raceName || !manual.netTime) {
-      setManualError('Race name and finish time are required.')
+    if (!manual.raceName) { setManualError('Race name is required.'); return }
+    if (manualStatus === 'completed' && !manual.netTime) {
+      setManualError('Finish time is required for completed races.')
       return
     }
     const distance = manual.distance === 'Other' ? manual.distanceCustom : manual.distance
@@ -123,13 +125,14 @@ export default function AddRacePage() {
           raceName: manual.raceName,
           raceDate: manual.raceDate,
           distance,
-          netTime: manual.netTime,
+          netTime: manualStatus === 'completed' ? manual.netTime : null,
           pace: manual.pace,
           overallPosition: manual.overallPosition,
           bibNumber: manual.bibNumber,
           category: manual.category,
           platform: 'Manual',
           runnerName: '',
+          status: manualStatus,
         }),
       })
       const json = await res.json()
@@ -304,6 +307,30 @@ export default function AddRacePage() {
       {mode === 'manual' && (
         <form onSubmit={handleManualSave}>
           <div className="bg-white rounded-3xl p-5 mb-4 flex flex-col gap-4" style={{ border: '1px solid #F0F0EE' }}>
+
+            {/* Status toggle — most important choice */}
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider block mb-2" style={{ color: '#aaa' }}>
+                Race type
+              </label>
+              <div className="flex rounded-2xl p-1" style={{ background: '#F8F8F7' }}>
+                {(['completed', 'upcoming'] as const).map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setManualStatus(s)}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                    style={{
+                      background: manualStatus === s ? (s === 'upcoming' ? '#FC4C02' : '#111') : 'transparent',
+                      color: manualStatus === s ? 'white' : '#888',
+                    }}
+                  >
+                    {s === 'completed' ? 'Completed' : 'Upcoming'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {mf('Race name *', 'raceName', 'e.g. Mumbai Marathon 2025')}
             {mf('Date', 'raceDate', 'YYYY-MM-DD', 'date')}
 
@@ -339,9 +366,13 @@ export default function AddRacePage() {
               )}
             </div>
 
-            {mf('Finish time *', 'netTime', 'HH:MM:SS or MM:SS')}
-            {mf('Pace', 'pace', 'MM:SS /km')}
-            {mf('Overall position', 'overallPosition', 'e.g. 42')}
+            {manualStatus === 'completed' && (
+              <>
+                {mf('Finish time *', 'netTime', 'HH:MM:SS or MM:SS')}
+                {mf('Pace', 'pace', 'MM:SS /km')}
+                {mf('Overall position', 'overallPosition', 'e.g. 42')}
+              </>
+            )}
             {mf('BIB number', 'bibNumber')}
             {mf('Category', 'category', 'e.g. M40-44')}
           </div>

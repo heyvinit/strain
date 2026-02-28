@@ -3,10 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import type { DbUserRace } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Image } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Sparkles } from 'lucide-react'
 import RaceActions from '@/components/RaceActions'
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatTime(t: string | null): string {
   if (!t) return '—'
@@ -15,20 +13,19 @@ function formatTime(t: string | null): string {
 
 function formatDate(d: string | null): string {
   if (!d) return '—'
-  const date = new Date(d + 'T00:00:00')
-  return date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', {
+    weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
+  })
 }
 
 function distanceLabel(d: string): string {
   const lower = d.toLowerCase()
-  if (lower.includes('42') || lower === 'fm') return 'Marathon'
-  if (lower.includes('21') || lower === 'hm') return 'Half Marathon'
+  if (lower.includes('42')) return 'Marathon'
+  if (lower.includes('21')) return 'Half Marathon'
   if (lower.includes('10')) return '10K'
   if (lower.includes('5k') || lower === '5') return '5K'
   return d
 }
-
-// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function RaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -42,7 +39,6 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
   if (!race) notFound()
 
-  // Check ownership
   const { data: owner } = await supabaseAdmin
     .from('users')
     .select('id')
@@ -51,7 +47,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
   const isOwner = owner?.id === race.user_id
 
-  const stats = [
+  const statRows = [
     { label: 'Distance', value: distanceLabel(race.distance) },
     { label: 'Pace', value: formatTime(race.pace) },
     { label: 'Overall', value: race.overall_position ?? '—' },
@@ -61,7 +57,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
   ].filter(s => s.value !== '—')
 
   return (
-    <div className="px-5 pt-14 pb-6" style={{ minHeight: '100vh' }}>
+    <div className="px-5 pt-14 pb-8">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link
@@ -76,10 +72,10 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
         </h1>
       </div>
 
-      {/* Race card */}
+      {/* Dark race ticket */}
       <div className="rounded-3xl overflow-hidden mb-4" style={{ background: '#111' }}>
         <div className="px-5 pt-5 pb-5">
-          {/* Status / PB badges */}
+          {/* Badges */}
           <div className="flex items-center gap-2 mb-4">
             <span
               className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
@@ -91,33 +87,26 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
               {race.status === 'completed' ? 'Completed' : 'Upcoming'}
             </span>
             {race.is_pb && (
-              <span
-                className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
-                style={{ background: '#2a1a0a', color: '#FC4C02' }}
-              >
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
+                style={{ background: '#2a1a0a', color: '#FC4C02' }}>
                 Personal Best
               </span>
             )}
           </div>
 
-          {/* Race name + date */}
           <p className="text-white font-bold text-xl leading-snug mb-1">{race.race_name}</p>
           <p className="text-sm mb-5" style={{ color: '#666' }}>{formatDate(race.race_date)}</p>
 
-          {/* Finish time — hero stat */}
           {race.net_time && (
             <div className="mb-5">
-              <p className="text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: '#555' }}>
-                Finish Time
-              </p>
+              <p className="text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: '#555' }}>Finish Time</p>
               <p className="text-4xl font-bold text-white tabular-nums">{formatTime(race.net_time)}</p>
             </div>
           )}
 
-          {/* Supporting stats grid */}
-          {stats.length > 0 && (
+          {statRows.length > 0 && (
             <div className="grid grid-cols-3 gap-2">
-              {stats.map(s => (
+              {statRows.map(s => (
                 <div key={s.label} className="rounded-2xl p-2.5" style={{ background: '#1a1a1a' }}>
                   <p className="text-[9px] font-bold tracking-widest mb-1 uppercase" style={{ color: '#555' }}>{s.label}</p>
                   <p className="text-xs font-bold text-white truncate">{s.value}</p>
@@ -127,7 +116,6 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
           )}
         </div>
 
-        {/* Timing platform strip */}
         {race.timing_platform && (
           <div className="px-5 py-2.5" style={{ borderTop: '1px solid #1a1a1a', background: '#0a0a0a' }}>
             <p className="text-[9px] font-mono tracking-wider" style={{ color: '#333' }}>
@@ -137,28 +125,41 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
         )}
       </div>
 
-      {/* Action buttons — owner only */}
+      {/* Owner actions */}
       {isOwner && (
-        <div className="flex flex-col gap-3 mb-4">
-          {/* Stat card button — only if result URL exists */}
-          {race.result_url && (
-            <a
-              href={`/?url=${encodeURIComponent(race.result_url)}`}
-              className="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold text-white"
+        <div className="flex flex-col gap-2">
+          {/* Stat card — only for completed races with a time */}
+          {race.status === 'completed' && race.net_time && (
+            <Link
+              href={`/dashboard/card?raceId=${race.id}`}
+              className="flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-semibold text-white"
               style={{ background: '#FC4C02' }}
             >
-              <Image size={15} />
+              <Sparkles size={15} />
               Create stat card
+            </Link>
+          )}
+
+          {/* External result */}
+          {race.result_url && (
+            <a
+              href={race.result_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium"
+              style={{ color: '#888', background: 'white', border: '1px solid #F0F0EE' }}
+            >
+              <ExternalLink size={13} />
+              View original result
             </a>
           )}
 
-          {/* Edit + Delete */}
-          <RaceActions race={race} />
+          <RaceActions raceId={race.id} />
         </div>
       )}
 
-      {/* External result link */}
-      {race.result_url && (
+      {/* Public view: just the external link */}
+      {!isOwner && race.result_url && (
         <a
           href={race.result_url}
           target="_blank"

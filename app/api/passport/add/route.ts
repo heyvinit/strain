@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const {
     raceName, raceDate, runnerName, bibNumber, distance,
     netTime, gunTime, pace, overallPosition, categoryPosition,
-    category, platform, result_url,
+    category, platform, result_url, status,
   } = body
 
   if (!raceName || !distance) {
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       category: category || null,
       timing_platform: platform || null,
       result_url: result_url || null,
-      status: 'completed',
+      status: status === 'upcoming' ? 'upcoming' : 'completed',
     })
     .select()
     .single()
