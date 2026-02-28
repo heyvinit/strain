@@ -110,10 +110,12 @@ function PassportCard({
   user,
   stats,
   username,
+  totalRaces,
 }: {
   user: DbUser
   stats: PassportStats
   username: string
+  totalRaces: number
 }) {
   const pbRows = [
     { label: 'Marathon', value: stats.pbs.fm },
@@ -159,7 +161,7 @@ function PassportCard({
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3 mb-5">
           {[
-            { label: 'TOTAL RACES', value: String(stats.totalRaces + upcoming.length) },
+            { label: 'TOTAL RACES', value: String(totalRaces) },
             { label: 'COMPLETED', value: String(stats.totalRaces) },
             { label: 'KM RAN', value: String(stats.totalKm) },
           ].map(({ label, value }) => (
@@ -294,6 +296,7 @@ export default async function DashboardPage() {
           user={user}
           stats={stats}
           username={session!.user.username}
+          totalRaces={allRaces.length}
         />
       )}
 
