@@ -2,7 +2,8 @@ import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import type { DbUserRace, DbUser } from '@/lib/supabase'
 import Link from 'next/link'
-import { ChevronRight, Share2 } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import ShareButton from '@/components/ShareButton'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -280,14 +281,7 @@ export default async function DashboardPage() {
             {firstName(user?.name)}
           </h1>
         </div>
-        <Link
-          href={`/${session!.user.username}`}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold"
-          style={{ background: '#F0F0EE', color: '#555' }}
-        >
-          <Share2 size={12} />
-          Share
-        </Link>
+        <ShareButton username={session!.user.username} />
       </div>
 
       {/* Passport card — always visible */}
