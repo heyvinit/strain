@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { recalcPBs } from '@/lib/pb'
 
 // Maps distance string to meters for sorting
 function toMeters(distance: string): number {
@@ -76,6 +77,8 @@ export async function POST(req: NextRequest) {
     console.error('[passport/add error]', insertError)
     return NextResponse.json({ success: false, error: 'Failed to save race' }, { status: 500 })
   }
+
+  await recalcPBs(user.id)
 
   return NextResponse.json({ success: true, race })
 }

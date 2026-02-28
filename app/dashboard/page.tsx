@@ -207,24 +207,26 @@ function PassportCard({
 function RaceRow({ race }: { race: DbUserRace }) {
   const { month, day } = formatDate(race.race_date)
   return (
-    <div className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3.5" style={{ border: '1px solid #F0F0EE' }}>
-      <div className="flex flex-col items-center w-9 shrink-0">
-        <span className="text-[10px] font-semibold" style={{ color: '#aaa' }}>{month}</span>
-        <span className="text-xl font-bold leading-tight" style={{ color: '#111' }}>{day}</span>
+    <Link href={`/dashboard/races/${race.id}`}>
+      <div className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3.5" style={{ border: '1px solid #F0F0EE' }}>
+        <div className="flex flex-col items-center w-9 shrink-0">
+          <span className="text-[10px] font-semibold" style={{ color: '#aaa' }}>{month}</span>
+          <span className="text-xl font-bold leading-tight" style={{ color: '#111' }}>{day}</span>
+        </div>
+        <div className="w-px self-stretch" style={{ background: '#F0F0EE' }} />
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
+          <p className="text-xs mt-0.5" style={{ color: '#888' }}>{distanceLabel(race.distance)}</p>
+        </div>
+        <div className="flex flex-col items-end shrink-0">
+          <span className="text-sm font-bold" style={{ color: '#111' }}>{formatTime(race.net_time)}</span>
+          {race.is_pb && (
+            <span className="text-[10px] font-bold mt-0.5" style={{ color: '#FC4C02' }}>PB</span>
+          )}
+        </div>
+        <ChevronRight size={14} color="#ccc" />
       </div>
-      <div className="w-px self-stretch" style={{ background: '#F0F0EE' }} />
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
-        <p className="text-xs mt-0.5" style={{ color: '#888' }}>{distanceLabel(race.distance)}</p>
-      </div>
-      <div className="flex flex-col items-end shrink-0">
-        <span className="text-sm font-bold" style={{ color: '#111' }}>{formatTime(race.net_time)}</span>
-        {race.is_pb && (
-          <span className="text-[10px] font-bold mt-0.5" style={{ color: '#FC4C02' }}>PB</span>
-        )}
-      </div>
-      <ChevronRight size={14} color="#ccc" />
-    </div>
+    </Link>
   )
 }
 

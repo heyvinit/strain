@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import RaceCard from '@/components/RaceCard'
 import Controls from '@/components/Controls'
 import { RaceData, CardStyle, ScrapeResult } from '@/lib/types'
@@ -32,38 +32,45 @@ export default function Home() {
   const [downloadError, setDownloadError] = useState<string | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!url.trim()) return
-
+  const scrape = useCallback(async (targetUrl: string) => {
+    if (!targetUrl.trim()) return
     setState('loading')
     setError(null)
     setRaceData(null)
-
     try {
       const res = await fetch('/api/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({ url: targetUrl.trim() }),
       })
       const result: ScrapeResult = await res.json()
-
       if (result.success && result.data) {
         setRaceData(result.data)
         setState('success')
       } else {
-        setError({
-          message: result.error || 'Could not extract race data.',
-          hint: result.hint,
-          isLeaderboard: result.isLeaderboardPage,
-        })
+        setError({ message: result.error || 'Could not extract race data.', hint: result.hint, isLeaderboard: result.isLeaderboardPage })
         setState('error')
       }
     } catch {
       setError({ message: 'Network error. Please check your connection and try again.' })
       setState('error')
     }
-  }, [url])
+  }, [])
+
+  // Pre-fill and auto-run from ?url= (e.g. "Create stat card" from race detail)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const prefill = params.get('url')
+    if (prefill) {
+      setUrl(prefill)
+      scrape(prefill)
+    }
+  }, [scrape])
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    scrape(url)
+  }, [url, scrape])
 
   const handleDownload = useCallback(async () => {
     if (!cardRef.current || !raceData) return
