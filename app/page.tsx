@@ -17,7 +17,7 @@ export default async function LandingPage() {
         background: 'linear-gradient(160deg, #111 0%, #1c1008 50%, #0e0e0e 100%)',
         backgroundImage: "url('/bg.jpg')",
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: 'center 40%',
       }}
     >
       {/* Dark overlay for readability */}
