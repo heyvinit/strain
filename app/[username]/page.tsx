@@ -43,7 +43,24 @@ function formatDate(d: string | null): { month: string; day: string } {
   }
 }
 
-// ─── Race row ──────────────────────────────────────────────────────────────────
+// ─── Race rows ─────────────────────────────────────────────────────────────────
+
+function UpcomingRow({ race }: { race: DbUserRace }) {
+  const { month, day } = formatDate(race.race_date)
+  return (
+    <div className="flex items-center gap-4 rounded-2xl px-4 py-3.5" style={{ background: '#FFF5F2', border: '1px solid #FFE0D6' }}>
+      <div className="flex flex-col items-center w-9 shrink-0">
+        <span className="text-[10px] font-semibold" style={{ color: '#FC4C02' }}>{month}</span>
+        <span className="text-xl font-bold leading-tight" style={{ color: '#FC4C02' }}>{day}</span>
+      </div>
+      <div className="w-px self-stretch" style={{ background: '#FFE0D6' }} />
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
+        <p className="text-xs mt-0.5" style={{ color: '#FC4C02' }}>Upcoming · {sportDistanceLabel(race.sport, race.distance)}</p>
+      </div>
+    </div>
+  )
+}
 
 function RaceRow({ race }: { race: DbUserRace }) {
   const { month, day } = formatDate(race.race_date)
@@ -113,6 +130,8 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
     .order('race_date', { ascending: false })
 
   const allRaces: DbUserRace[] = races ?? []
+  const today = new Date().toISOString().split('T')[0]
+  const upcoming = allRaces.filter(r => r.status === 'upcoming' && r.race_date && r.race_date >= today)
   const past = allRaces.filter(r => r.status === 'completed')
   const stats = computePassportStats(allRaces)
 
@@ -128,24 +147,26 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
               stats={stats}
               username={username}
             />
-
-            {/* CTA */}
-            <div className="pb-8 lg:pb-0 text-center">
-              <p className="text-xs mb-3" style={{ color: '#aaa' }}>Powered by Strain</p>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold text-white"
-                style={{ background: '#FC4C02' }}
-              >
-                Create your own passport
-              </Link>
-            </div>
           </div>
 
-          {/* ── Right col: race history ── */}
-          {past.length > 0 && (
-            <div className="lg:flex-1 lg:min-w-0">
-              <section>
+          {/* ── Right col: upcoming + race history + CTA ── */}
+          <div className="lg:flex-1 lg:min-w-0 flex flex-col">
+
+            {/* Upcoming */}
+            {upcoming.length > 0 && (
+              <section className="mb-5">
+                <h2 className="text-xs font-semibold mb-3 tracking-wider uppercase" style={{ color: '#888' }}>
+                  Upcoming
+                </h2>
+                <div className="flex flex-col gap-2">
+                  {upcoming.map(r => <UpcomingRow key={r.id} race={r} />)}
+                </div>
+              </section>
+            )}
+
+            {/* Race history */}
+            {past.length > 0 && (
+              <section className="mb-5">
                 <h2 className="text-xs font-semibold mb-3 tracking-wider uppercase" style={{ color: '#888' }}>
                   Race History
                 </h2>
@@ -153,9 +174,21 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
                   {past.map(race => <RaceRow key={race.id} race={race} />)}
                 </div>
               </section>
-            </div>
-          )}
+            )}
 
+            {/* CTA — always at the bottom */}
+            <div className="pt-4 pb-6 text-center">
+              <p className="text-xs mb-3" style={{ color: '#aaa' }}>Powered by Strain</p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold text-white active:scale-[0.98] transition-transform duration-75"
+                style={{ background: '#FC4C02' }}
+              >
+                Create your own passport
+              </Link>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
