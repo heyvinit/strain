@@ -48,7 +48,8 @@ export async function GET() {
   )
 
   if (res.status === 401) {
-    return NextResponse.json({ error: 'Strava token expired — please log out and log back in' }, { status: 401 })
+    // Could be expired token or missing activity:read_all scope (granted on re-login)
+    return NextResponse.json({ error: 'Please log out and log back in to grant activity access' }, { status: 401 })
   }
 
   if (!res.ok) {
