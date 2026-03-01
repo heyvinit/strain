@@ -70,7 +70,7 @@ function RaceRow({ race }: { race: DbUserRace }) {
 
   if (race.result_url) {
     return (
-      <a href={race.result_url} target="_blank" rel="noopener noreferrer">
+      <a href={race.result_url} target="_blank" rel="noopener noreferrer" className="block active:scale-[0.98] transition-transform duration-75">
         {Inner}
       </a>
     )

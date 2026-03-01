@@ -53,7 +53,7 @@ function firstName(name: string | null | undefined): string {
 function RaceRow({ race }: { race: DbUserRace }) {
   const { month, day } = formatDate(race.race_date)
   return (
-    <Link href={`/dashboard/races/${race.id}`}>
+    <Link href={`/dashboard/races/${race.id}`} className="block active:scale-[0.98] transition-transform duration-75">
       <div className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3.5" style={{ border: '1px solid #F0F0EE' }}>
         <div className="flex flex-col items-center w-9 shrink-0">
           <span className="text-[10px] font-semibold" style={{ color: '#aaa' }}>{month}</span>
@@ -79,7 +79,7 @@ function RaceRow({ race }: { race: DbUserRace }) {
 function UpcomingRow({ race }: { race: DbUserRace }) {
   const { month, day } = formatDate(race.race_date)
   return (
-    <Link href={`/dashboard/races/${race.id}`}>
+    <Link href={`/dashboard/races/${race.id}`} className="block active:scale-[0.98] transition-transform duration-75">
       <div className="flex items-center gap-4 rounded-2xl px-4 py-3.5" style={{ background: '#FFF5F2', border: '1px solid #FFE0D6' }}>
         <div className="flex flex-col items-center w-9 shrink-0">
           <span className="text-[10px] font-semibold" style={{ color: '#FC4C02' }}>{month}</span>
@@ -168,7 +168,7 @@ export default async function DashboardPage() {
                 {past.map(race => <RaceRow key={race.id} race={race} />)}
               </div>
             ) : (
-              <Link href="/dashboard/add" className="block">
+              <Link href="/dashboard/add" className="block active:scale-[0.98] transition-transform duration-75">
                 <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'white', border: '1px dashed #E0E0E0' }}>
                   <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FFF5F2' }}>
                     <span style={{ color: '#FC4C02', fontSize: 18, fontWeight: 700 }}>+</span>

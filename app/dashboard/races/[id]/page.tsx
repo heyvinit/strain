@@ -168,7 +168,18 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
             </a>
           )}
 
-          <RaceActions raceId={race.id} />
+          <RaceActions
+            raceId={race.id}
+            status={race.status}
+            race={{
+              raceName: race.race_name,
+              raceDate: race.race_date,
+              distance: race.distance,
+              bibNumber: race.bib_number,
+              country: race.country,
+              sport: race.sport,
+            }}
+          />
         </div>
       )}
 
