@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: 'Strain — Athlete Passport',
   description: 'Your athlete passport. Track every race and event, share your stats.',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.png',
+    apple: '/favicon.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
