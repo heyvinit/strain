@@ -68,10 +68,10 @@ export default async function LandingPage() {
       </p>
 
       {/* Legal links */}
-      <div className="relative z-10 mt-3 flex items-center gap-3 text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
-        <a href="/privacy" className="underline underline-offset-2 hover:opacity-60">Privacy</a>
+      <div className="relative z-10 mt-3 flex items-center gap-3" style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>
+        <a href="/privacy" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy Policy</a>
         <span>·</span>
-        <a href="/terms" className="underline underline-offset-2 hover:opacity-60">Terms</a>
+        <a href="/terms" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms of Service</a>
       </div>
     </main>
   )
