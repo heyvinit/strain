@@ -109,6 +109,11 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   return {
     title: `${user.name} — Athlete Passport`,
     description: `${user.name}'s athlete passport on Strain. Race history, personal bests, and stats.`,
+    twitter: {
+      card: 'summary_large_image',
+      title: `${user.name} — Athlete Passport`,
+      description: `${user.name}'s athlete passport on Strain.`,
+    },
   }
 }
 
