@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const {
     raceName, raceDate, runnerName, bibNumber, distance,
     netTime, gunTime, pace, overallPosition, categoryPosition,
-    category, platform, result_url, status, sport,
+    category, platform, result_url, status, sport, country,
   } = body
 
   if (!raceName || !distance) {
@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
       timing_platform: platform || null,
       sport: ['running','hyrox','triathlon','ocr','cycling','other'].includes(sport) ? sport : 'running',
       result_url: result_url || null,
+      country: country || null,
       status: status === 'upcoming' ? 'upcoming' : 'completed',
     })
     .select()
