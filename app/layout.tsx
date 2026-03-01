@@ -8,8 +8,8 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-grote
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
-  title: 'Strain — Runner Passport',
-  description: 'Your runner passport. Track every race, share your stats.',
+  title: 'Strain — Athlete Passport',
+  description: 'Your athlete passport. Track every race and event, share your stats.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

@@ -19,7 +19,7 @@ export default async function LoginPage() {
 
         {/* Tagline */}
         <p className="text-sm mb-16" style={{ color: '#888' }}>
-          Your running passport
+          Your athlete passport
         </p>
 
         {/* Sign in card */}
@@ -28,7 +28,7 @@ export default async function LoginPage() {
             Welcome to Strain
           </h1>
           <p className="text-sm mb-6" style={{ color: '#888' }}>
-            Sign in to build your runner passport and track every race.
+            Sign in to build your athlete passport and track every event.
           </p>
 
           <form

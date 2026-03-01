@@ -25,6 +25,8 @@ export interface DbUser {
   created_at: string
 }
 
+export type SportType = 'running' | 'hyrox' | 'triathlon' | 'ocr' | 'cycling' | 'other'
+
 export interface DbUserRace {
   id: string
   user_id: string
@@ -32,6 +34,7 @@ export interface DbUserRace {
   race_date: string | null
   city: string | null
   country: string | null
+  sport: SportType
   distance: string
   distance_meters: number | null
   net_time: string | null

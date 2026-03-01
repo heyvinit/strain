@@ -17,21 +17,24 @@ function timeToSecs(t: string | null): number {
   return Infinity
 }
 
-/** Recalculates is_pb for all completed races for a user. */
+/** Recalculates is_pb for all completed running races for a user. */
 export async function recalcPBs(userId: string): Promise<void> {
   const { data: races } = await supabaseAdmin
     .from('user_races')
-    .select('id, distance, net_time, status')
+    .select('id, distance, net_time, status, sport')
     .eq('user_id', userId)
     .eq('status', 'completed')
 
   if (!races?.length) return
 
+  // PBs only meaningful for running races
+  const runningRaces = races.filter(r => !r.sport || r.sport === 'running')
+
   // Find fastest per category
   const best: Record<string, number> = {}
   const bestId: Record<string, string> = {}
 
-  for (const r of races) {
+  for (const r of runningRaces) {
     if (!r.net_time) continue
     const cat = distanceCategory(r.distance)
     const secs = timeToSecs(r.net_time)
@@ -43,12 +46,14 @@ export async function recalcPBs(userId: string): Promise<void> {
 
   const pbIds = new Set(Object.values(bestId))
 
-  // Batch update all to is_pb = false first, then flip the winners
-  await supabaseAdmin
-    .from('user_races')
-    .update({ is_pb: false })
-    .eq('user_id', userId)
-    .eq('status', 'completed')
+  // Reset is_pb on all running races, then flip winners
+  const runningIds = runningRaces.map(r => r.id)
+  if (runningIds.length > 0) {
+    await supabaseAdmin
+      .from('user_races')
+      .update({ is_pb: false })
+      .in('id', runningIds)
+  }
 
   if (pbIds.size > 0) {
     await supabaseAdmin

@@ -7,6 +7,18 @@ import ShareButton from '@/components/ShareButton'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const SPORT_LABELS: Record<string, string> = {
+  running: '', hyrox: 'Hyrox', triathlon: 'Triathlon',
+  ocr: 'OCR', cycling: 'Cycling', other: '',
+}
+
+function sportDistanceLabel(sport: string | null | undefined, distance: string): string {
+  const label = distanceLabel(distance)
+  const sportName = SPORT_LABELS[sport ?? 'running']
+  if (!sportName) return label
+  return `${sportName} · ${label}`
+}
+
 function distanceLabel(d: string): string {
   const lower = d.toLowerCase()
   if (lower.includes('42') || lower === 'fm') return 'Marathon'
@@ -77,13 +89,14 @@ interface PassportStats {
 
 function computeStats(races: DbUserRace[]): PassportStats {
   const completed = races.filter(r => r.status === 'completed')
+  const running = completed.filter(r => !r.sport || r.sport === 'running')
 
-  const totalKm = completed.reduce((sum, r) => sum + distanceToKm(r.distance), 0)
+  const totalKm = running.reduce((sum, r) => sum + distanceToKm(r.distance), 0)
 
-  // Best time per category
+  // PBs only for running
   const best: Record<string, number> = {}
   const bestTime: Record<string, string> = {}
-  for (const r of completed) {
+  for (const r of running) {
     if (!r.net_time) continue
     const cat = distanceCategory(r.distance)
     const secs = timeToSecs(r.net_time)
@@ -134,7 +147,7 @@ function PassportCard({
         <div className="flex items-start justify-between mb-5">
           <div>
             <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-0.5" style={{ color: '#FC4C02' }}>
-              Runner Passport
+              Athlete Passport
             </p>
             <p className="text-[10px] tracking-widest uppercase" style={{ color: '#444' }}>
               STRAIN · GETSTRAIN.APP
@@ -216,7 +229,7 @@ function RaceRow({ race }: { race: DbUserRace }) {
         <div className="w-px self-stretch" style={{ background: '#F0F0EE' }} />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
-          <p className="text-xs mt-0.5" style={{ color: '#888' }}>{distanceLabel(race.distance)}</p>
+          <p className="text-xs mt-0.5" style={{ color: '#888' }}>{sportDistanceLabel(race.sport, race.distance)}</p>
         </div>
         <div className="flex flex-col items-end shrink-0">
           <span className="text-sm font-bold" style={{ color: '#111' }}>{formatTime(race.net_time)}</span>
@@ -243,7 +256,7 @@ function UpcomingRow({ race }: { race: DbUserRace }) {
       <div className="w-px self-stretch" style={{ background: '#FFE0D6' }} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
-        <p className="text-xs mt-0.5" style={{ color: '#FC4C02' }}>Upcoming · {race.distance}</p>
+        <p className="text-xs mt-0.5" style={{ color: '#FC4C02' }}>Upcoming · {sportDistanceLabel(race.sport, race.distance)}</p>
       </div>
       <ChevronRight size={14} color="#FC4C02" />
     </div>

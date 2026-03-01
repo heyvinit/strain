@@ -13,7 +13,7 @@ export default function ShareButton({ username }: { username: string }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'My Runner Passport',
+          title: 'My Athlete Passport',
           text: 'Check out my running passport on Strain',
           url,
         })

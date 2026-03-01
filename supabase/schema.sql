@@ -26,8 +26,9 @@ CREATE TABLE IF NOT EXISTS user_races (
   race_date         DATE,
   city              TEXT,
   country           TEXT,
-  distance          TEXT NOT NULL,     -- '42.2K', '21.1K', '10K', '5K', etc.
-  distance_meters   INTEGER,           -- for sorting (42200, 21100, 10000, 5000)
+  sport             TEXT NOT NULL DEFAULT 'running',  -- running, hyrox, triathlon, ocr, cycling, other
+  distance          TEXT NOT NULL,     -- '42.2K', '21.1K', '10K', 'Singles', 'Full Ironman', etc.
+  distance_meters   INTEGER,           -- for sorting (running only)
 
   -- Result
   net_time          TEXT,              -- 'H:MM:SS'

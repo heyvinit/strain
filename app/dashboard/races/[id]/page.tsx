@@ -76,23 +76,37 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
       <div className="rounded-3xl overflow-hidden mb-4" style={{ background: '#111' }}>
         <div className="px-5 pt-5 pb-5">
           {/* Badges */}
-          <div className="flex items-center gap-2 mb-4">
-            <span
-              className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
-              style={{
-                background: race.status === 'completed' ? '#1a2a1a' : '#2a1a0a',
-                color: race.status === 'completed' ? '#4ade80' : '#FC4C02',
-              }}
-            >
-              {race.status === 'completed' ? 'Completed' : 'Upcoming'}
-            </span>
-            {race.is_pb && (
-              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
-                style={{ background: '#2a1a0a', color: '#FC4C02' }}>
-                Personal Best
-              </span>
-            )}
-          </div>
+          {(() => {
+            const SPORT_LABELS: Record<string, string> = {
+              hyrox: 'Hyrox', triathlon: 'Triathlon', ocr: 'OCR', cycling: 'Cycling', other: 'Other',
+            }
+            const sportLabel = SPORT_LABELS[race.sport]
+            return (
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
+                {sportLabel && (
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
+                    style={{ background: '#1a1a2a', color: '#818cf8' }}>
+                    {sportLabel}
+                  </span>
+                )}
+                <span
+                  className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
+                  style={{
+                    background: race.status === 'completed' ? '#1a2a1a' : '#2a1a0a',
+                    color: race.status === 'completed' ? '#4ade80' : '#FC4C02',
+                  }}
+                >
+                  {race.status === 'completed' ? 'Completed' : 'Upcoming'}
+                </span>
+                {race.is_pb && (
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
+                    style={{ background: '#2a1a0a', color: '#FC4C02' }}>
+                    Personal Best
+                  </span>
+                )}
+              </div>
+            )
+          })()}
 
           <p className="text-white font-bold text-xl leading-snug mb-1">{race.race_name}</p>
           <p className="text-sm mb-5" style={{ color: '#666' }}>{formatDate(race.race_date)}</p>

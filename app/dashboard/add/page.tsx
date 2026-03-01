@@ -24,13 +24,58 @@ interface RacePreview {
   platform: string
 }
 
-const DISTANCES = [
-  { label: 'Marathon', value: 'Marathon (42.2km)' },
-  { label: 'Half', value: 'Half Marathon (21.1km)' },
-  { label: '10K', value: '10K' },
-  { label: '5K', value: '5K' },
-  { label: 'Other', value: 'Other' },
-]
+const SPORTS = [
+  { key: 'running',   label: 'Running',    icon: '🏃' },
+  { key: 'hyrox',     label: 'Hyrox',      icon: '🏋️' },
+  { key: 'triathlon', label: 'Triathlon',  icon: '🏊' },
+  { key: 'ocr',       label: 'OCR',        icon: '💪' },
+  { key: 'cycling',   label: 'Cycling',    icon: '🚴' },
+  { key: 'other',     label: 'Other',      icon: '🏅' },
+] as const
+
+type SportKey = typeof SPORTS[number]['key']
+
+const SPORT_DISTANCES: Record<SportKey, { label: string; value: string }[]> = {
+  running:   [
+    { label: 'Marathon', value: 'Marathon (42.2km)' },
+    { label: 'Half', value: 'Half Marathon (21.1km)' },
+    { label: '10K', value: '10K' },
+    { label: '5K', value: '5K' },
+    { label: 'Other', value: 'Other' },
+  ],
+  hyrox:     [
+    { label: 'Singles', value: 'Singles' },
+    { label: 'Doubles', value: 'Doubles' },
+    { label: 'Pro', value: 'Pro' },
+    { label: 'Relay', value: 'Relay' },
+    { label: 'Other', value: 'Other' },
+  ],
+  triathlon: [
+    { label: 'Full / Ironman', value: 'Full Ironman (140.6mi)' },
+    { label: '70.3 / Half', value: 'Ironman 70.3' },
+    { label: 'Olympic', value: 'Olympic Distance' },
+    { label: 'Sprint', value: 'Sprint' },
+    { label: 'Other', value: 'Other' },
+  ],
+  ocr: [
+    { label: '3K', value: '3K' },
+    { label: '5K', value: '5K' },
+    { label: '8-10K', value: '8-10K' },
+    { label: '12-15K', value: '12-15K' },
+    { label: '20K+', value: '20K+' },
+    { label: 'Other', value: 'Other' },
+  ],
+  cycling: [
+    { label: '50K', value: '50K' },
+    { label: '100K', value: '100K' },
+    { label: 'Gran Fondo', value: 'Gran Fondo' },
+    { label: 'Century', value: 'Century (160km)' },
+    { label: 'Other', value: 'Other' },
+  ],
+  other: [
+    { label: 'Other', value: 'Other' },
+  ],
+}
 
 // ─── Shared input helpers ──────────────────────────────────────────────────────
 
@@ -58,17 +103,47 @@ function Field({
   )
 }
 
-function DistancePicker({ value, customValue, onSelect, onCustom }: {
-  value: string; customValue: string
-  onSelect: (v: string) => void; onCustom: (v: string) => void
-}) {
+function SportPicker({ value, onChange }: { value: SportKey; onChange: (s: SportKey) => void }) {
   return (
     <div>
       <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1.5" style={{ color: '#aaa' }}>
-        Distance
+        Sport / Event type
+      </label>
+      <div className="grid grid-cols-3 gap-2">
+        {SPORTS.map(s => (
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => onChange(s.key)}
+            className="flex flex-col items-center gap-1 py-3 rounded-2xl text-xs font-semibold transition-all"
+            style={{
+              background: value === s.key ? '#111' : '#F8F8F7',
+              color: value === s.key ? 'white' : '#666',
+              border: '1px solid',
+              borderColor: value === s.key ? '#111' : '#ECECEA',
+            }}
+          >
+            <span className="text-base leading-none">{s.icon}</span>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DistancePicker({ sport, value, customValue, onSelect, onCustom }: {
+  sport: SportKey; value: string; customValue: string
+  onSelect: (v: string) => void; onCustom: (v: string) => void
+}) {
+  const options = SPORT_DISTANCES[sport]
+  return (
+    <div>
+      <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1.5" style={{ color: '#aaa' }}>
+        {sport === 'hyrox' ? 'Format' : sport === 'triathlon' ? 'Distance / Format' : 'Distance'}
       </label>
       <div className="flex flex-wrap gap-2 mb-2">
-        {DISTANCES.map(d => (
+        {options.map(d => (
           <button
             key={d.value}
             type="button"
@@ -106,6 +181,7 @@ export default function AddRacePage() {
   const [done, setDone] = useState(false)
 
   // ── Upcoming form state ──────────────────────────────────────────────────────
+  const [upcomingSport, setUpcomingSport] = useState<SportKey>('running')
   const [upcoming, setUpcoming] = useState({
     raceName: '', raceDate: '', distance: '10K', distanceCustom: '', bibNumber: '', city: '',
   })
@@ -122,6 +198,7 @@ export default function AddRacePage() {
   const [urlError, setUrlError] = useState('')
 
   // ── Past: Manual form ────────────────────────────────────────────────────────
+  const [manualSport, setManualSport] = useState<SportKey>('running')
   const [manual, setManual] = useState({
     raceName: '', raceDate: '', distance: '10K', distanceCustom: '',
     netTime: '', pace: '', overallPosition: '', bibNumber: '', category: '',
@@ -154,6 +231,7 @@ export default function AddRacePage() {
       const json = await saveToPassport({
         raceName: upcoming.raceName,
         raceDate: upcoming.raceDate,
+        sport: upcomingSport,
         distance,
         bibNumber: upcoming.bibNumber,
         status: 'upcoming',
@@ -218,7 +296,8 @@ export default function AddRacePage() {
     setManualError('')
     try {
       const json = await saveToPassport({
-        raceName: manual.raceName, raceDate: manual.raceDate, distance,
+        raceName: manual.raceName, raceDate: manual.raceDate,
+        sport: manualSport, distance,
         netTime: manual.netTime, pace: manual.pace,
         overallPosition: manual.overallPosition, bibNumber: manual.bibNumber,
         category: manual.category, platform: 'Manual', runnerName: '', status: 'completed',
@@ -286,6 +365,10 @@ export default function AddRacePage() {
             className="rounded-3xl p-5 mb-4 flex flex-col gap-4"
             style={{ background: 'white', border: '1px solid #F0F0EE' }}
           >
+            <SportPicker
+              value={upcomingSport}
+              onChange={s => { setUpcomingSport(s); setUpcoming(u => ({ ...u, distance: SPORT_DISTANCES[s][0].value, distanceCustom: '' })) }}
+            />
             <Field
               label="Race name"
               value={upcoming.raceName}
@@ -300,6 +383,7 @@ export default function AddRacePage() {
               optional
             />
             <DistancePicker
+              sport={upcomingSport}
               value={upcoming.distance}
               customValue={upcoming.distanceCustom}
               onSelect={v => setUpcoming(s => ({ ...s, distance: v }))}
@@ -479,20 +563,25 @@ export default function AddRacePage() {
           {pastMethod === 'manual' && (
             <form onSubmit={handleManualSave}>
               <div className="rounded-3xl p-5 mb-4 flex flex-col gap-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
-                <Field
-                  label="Race name"
-                  value={manual.raceName}
-                  onChange={v => setManual(s => ({ ...s, raceName: v }))}
-                  placeholder="e.g. Delhi Half Marathon 2025"
+                <SportPicker
+                  value={manualSport}
+                  onChange={s => { setManualSport(s); setManual(m => ({ ...m, distance: SPORT_DISTANCES[s][0].value, distanceCustom: '' })) }}
                 />
                 <Field
-                  label="Race date"
+                  label="Race / Event name"
+                  value={manual.raceName}
+                  onChange={v => setManual(s => ({ ...s, raceName: v }))}
+                  placeholder="e.g. Hyrox Dubai 2025"
+                />
+                <Field
+                  label="Date"
                   value={manual.raceDate}
                   onChange={v => setManual(s => ({ ...s, raceDate: v }))}
                   type="date"
                   optional
                 />
                 <DistancePicker
+                  sport={manualSport}
                   value={manual.distance}
                   customValue={manual.distanceCustom}
                   onSelect={v => setManual(s => ({ ...s, distance: v }))}

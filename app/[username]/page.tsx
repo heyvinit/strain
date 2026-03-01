@@ -7,6 +7,18 @@ import type { Metadata } from 'next'
 
 // ─── Helpers (duplicated from dashboard; can be extracted later) ───────────────
 
+const SPORT_LABELS: Record<string, string> = {
+  running: '', hyrox: 'Hyrox', triathlon: 'Triathlon',
+  ocr: 'OCR', cycling: 'Cycling', other: '',
+}
+
+function sportDistanceLabel(sport: string | null | undefined, distance: string): string {
+  const label = distanceLabel(distance)
+  const sportName = SPORT_LABELS[sport ?? 'running']
+  if (!sportName) return label
+  return `${sportName} · ${label}`
+}
+
 function distanceLabel(d: string): string {
   const lower = d.toLowerCase()
   if (lower.includes('42') || lower === 'fm') return 'Marathon'
@@ -119,7 +131,7 @@ function PassportCard({
         <div className="flex items-start justify-between mb-5">
           <div>
             <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-0.5" style={{ color: '#FC4C02' }}>
-              Runner Passport
+              Athlete Passport
             </p>
             <p className="text-[10px] tracking-widest uppercase" style={{ color: '#444' }}>
               STRAIN · GETSTRAIN.APP
@@ -197,7 +209,7 @@ function RaceRow({ race }: { race: DbUserRace }) {
       <div className="w-px self-stretch" style={{ background: '#F0F0EE' }} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
-        <p className="text-xs mt-0.5" style={{ color: '#888' }}>{distanceLabel(race.distance)}</p>
+        <p className="text-xs mt-0.5" style={{ color: '#888' }}>{sportDistanceLabel(race.sport, race.distance)}</p>
       </div>
       <div className="flex flex-col items-end shrink-0">
         <span className="text-sm font-bold" style={{ color: '#111' }}>{formatTime(race.net_time)}</span>
@@ -229,9 +241,9 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
     .eq('username', username)
     .single<DbUser>()
 
-  if (!user) return { title: 'Runner Passport — Strain' }
+  if (!user) return { title: 'Athlete Passport — Strain' }
   return {
-    title: `${user.name} — Runner Passport`,
+    title: `${user.name} — Athlete Passport`,
     description: `${user.name}'s running passport on Strain. Race history, personal bests, and total km.`,
   }
 }
