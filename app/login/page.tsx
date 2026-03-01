@@ -52,7 +52,10 @@ export default async function LoginPage() {
         </div>
 
         <p className="text-xs mt-6 text-center" style={{ color: '#bbb' }}>
-          By signing in you agree to our terms of service.
+          By signing in you agree to our{' '}
+          <a href="/terms" className="underline underline-offset-2">terms</a>
+          {' '}and{' '}
+          <a href="/privacy" className="underline underline-offset-2">privacy policy</a>.
         </p>
       </div>
     </main>

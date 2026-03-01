@@ -66,6 +66,13 @@ export default async function LandingPage() {
           Sign in
         </a>
       </p>
+
+      {/* Legal links */}
+      <div className="relative z-10 mt-3 flex items-center gap-3 text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+        <a href="/privacy" className="underline underline-offset-2 hover:opacity-60">Privacy</a>
+        <span>·</span>
+        <a href="/terms" className="underline underline-offset-2 hover:opacity-60">Terms</a>
+      </div>
     </main>
   )
 }
