@@ -170,8 +170,8 @@ export default function PassportCard({
   const flags = stats.countries
     .map(c => ({ country: c, flag: countryToFlag(c) }))
     .filter(f => f.flag !== null) as { country: string; flag: string }[]
-  const extraFlags = flags.length > 7 ? flags.length - 7 : 0
-  const visibleFlags = flags.slice(0, 7)
+  const extraFlags = flags.length > 5 ? flags.length - 5 : 0
+  const visibleFlags = flags.slice(0, 5)
 
   // MRZ — single full-width line
   const user42 = username.toUpperCase().replace(/_/g, '<')
@@ -218,8 +218,8 @@ export default function PassportCard({
           </div>
         </div>
 
-        {/* Stats: Completed | Upcoming */}
-        <div className="grid grid-cols-2 gap-2.5 mb-4">
+        {/* Stats: Completed | Upcoming | Countries */}
+        <div className="grid grid-cols-3 gap-2.5 mb-4">
           {[
             { label: 'COMPLETED', value: String(stats.completed) },
             { label: 'UPCOMING', value: String(stats.upcoming) },
@@ -229,47 +229,52 @@ export default function PassportCard({
               <p className="text-sm font-bold text-white">{value}</p>
             </div>
           ))}
-        </div>
 
-        {/* Country flags */}
-        {visibleFlags.length > 0 && (
-          <div className="flex items-center mb-4" style={{ gap: 0 }}>
-            {visibleFlags.map((f, i) => (
-              <div
-                key={f.country}
-                className="flex items-center justify-center rounded-full text-base"
-                style={{
-                  width: 30, height: 30,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '2px solid #0e0e0e',
-                  marginLeft: i > 0 ? -6 : 0,
-                  fontSize: 16,
-                  lineHeight: 1,
-                  zIndex: visibleFlags.length - i,
-                  position: 'relative',
-                }}
-              >
-                {f.flag}
+          {/* Countries box with stacked flags */}
+          <div className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <p className="text-[9px] font-bold tracking-widest mb-1.5" style={{ color: '#555' }}>COUNTRIES</p>
+            {visibleFlags.length > 0 ? (
+              <div className="flex items-center" style={{ gap: 0 }}>
+                {visibleFlags.map((f, i) => (
+                  <div
+                    key={f.country}
+                    className="flex items-center justify-center rounded-full"
+                    style={{
+                      width: 22, height: 22,
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1.5px solid #0e0e0e',
+                      marginLeft: i > 0 ? -5 : 0,
+                      fontSize: 13,
+                      lineHeight: 1,
+                      zIndex: visibleFlags.length - i,
+                      position: 'relative',
+                    }}
+                  >
+                    {f.flag}
+                  </div>
+                ))}
+                {extraFlags > 0 && (
+                  <div
+                    className="flex items-center justify-center rounded-full text-[8px] font-bold"
+                    style={{
+                      width: 22, height: 22,
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1.5px solid #0e0e0e',
+                      marginLeft: -5,
+                      color: '#666',
+                      position: 'relative',
+                      zIndex: 0,
+                    }}
+                  >
+                    +{extraFlags}
+                  </div>
+                )}
               </div>
-            ))}
-            {extraFlags > 0 && (
-              <div
-                className="flex items-center justify-center rounded-full text-[9px] font-bold"
-                style={{
-                  width: 30, height: 30,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '2px solid #0e0e0e',
-                  marginLeft: -6,
-                  color: '#666',
-                  position: 'relative',
-                  zIndex: 0,
-                }}
-              >
-                +{extraFlags}
-              </div>
+            ) : (
+              <p className="text-sm font-bold text-white">0</p>
             )}
           </div>
-        )}
+        </div>
 
         {/* PBs */}
         {pbRows.length > 0 && (
