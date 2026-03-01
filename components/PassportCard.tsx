@@ -183,7 +183,7 @@ export default function PassportCard({
 
   return (
     <div
-      className="rounded-3xl overflow-hidden mb-6 w-full"
+      className="rounded-3xl overflow-hidden mb-6 w-full mx-auto"
       style={{
         maxWidth: 360,
         background: 'radial-gradient(ellipse at 18% 0%, #232323 0%, #0e0e0e 55%, #161616 100%)',
