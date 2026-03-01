@@ -83,7 +83,6 @@ export default function MockPassport() {
               STRAIN · GETSTRAIN.APP
             </p>
           </div>
-          <img src="/strain-logo.svg" alt="Strain" className="h-5 w-auto opacity-20" style={{ filter: 'invert(1)' }} />
         </div>
 
         {/* Identity */}
