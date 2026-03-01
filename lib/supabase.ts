@@ -23,6 +23,8 @@ export interface DbUser {
   city: string | null
   country: string | null
   email: string | null
+  email_pre_race: boolean
+  email_post_race: boolean
   created_at: string
 }
 

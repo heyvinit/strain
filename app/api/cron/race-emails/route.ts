@@ -36,11 +36,12 @@ export async function GET(req: NextRequest) {
   for (const race of preRaces ?? []) {
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('name, email')
+      .select('name, email, email_pre_race')
       .eq('id', race.user_id)
       .single()
 
     if (!user?.email) continue
+    if (user.email_pre_race === false) continue
 
     try {
       await sendPreRaceEmail({
@@ -75,11 +76,12 @@ export async function GET(req: NextRequest) {
   for (const race of postRaces ?? []) {
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('name, email')
+      .select('name, email, email_post_race')
       .eq('id', race.user_id)
       .single()
 
     if (!user?.email) continue
+    if (user.email_post_race === false) continue
 
     try {
       await sendPostRaceEmail({

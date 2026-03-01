@@ -1,7 +1,6 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import BottomNav from '@/components/BottomNav'
-import { logout } from '@/app/actions'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -12,7 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen pb-28" style={{ background: '#F8F8F7' }}>
       {children}
-      <BottomNav username={username} logout={logout} />
+      <BottomNav username={username} />
     </div>
   )
 }
