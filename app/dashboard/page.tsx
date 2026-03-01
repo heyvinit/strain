@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import ShareButton from '@/components/ShareButton'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
+import EmailPrompt from '@/components/EmailPrompt'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,10 @@ export default async function DashboardPage() {
             </div>
             <ShareButton username={session!.user.username} />
           </div>
+
+          {user && !user.email && (
+            <EmailPrompt userId={user.id} />
+          )}
 
           {user && (
             <PassportCard
