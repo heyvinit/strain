@@ -22,6 +22,7 @@ export interface DbUser {
   avatar_url: string | null
   city: string | null
   country: string | null
+  email: string | null
   created_at: string
 }
 
@@ -48,5 +49,7 @@ export interface DbUserRace {
   timing_platform: string | null
   status: 'upcoming' | 'completed'
   is_pb: boolean
+  pre_race_email_sent: boolean
+  post_race_email_sent: boolean
   created_at: string
 }

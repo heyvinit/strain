@@ -28,6 +28,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             avatar_url: p.profile_medium || p.profile || null,
             city: p.city || null,
             country: p.country || null,
+            email: p.email || null,
             updated_at: new Date().toISOString(),
           },
           { onConflict: 'strava_id' }
