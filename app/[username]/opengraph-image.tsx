@@ -18,8 +18,8 @@ function issuedDate(): string {
     .toUpperCase().replace(' ', '')
 }
 
-export default async function Image({ params }: { params: { username: string } }) {
-  const { username } = params
+export default async function Image({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params
 
   const { data: user } = await supabaseAdmin
     .from('users').select('*').eq('username', username).single<DbUser>()
