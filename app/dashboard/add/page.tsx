@@ -752,9 +752,14 @@ export default function AddRacePage() {
                 <div>
                   <div className="rounded-3xl overflow-hidden mb-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
                     <div className="px-5 pt-4 pb-2 flex items-center justify-between">
-                      <p className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>
-                        {stravaRaces.length} race{stravaRaces.length !== 1 ? 's' : ''} found
-                      </p>
+                      <div>
+                        <p className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>
+                          {stravaRaces.length} race{stravaRaces.length !== 1 ? 's' : ''} found
+                        </p>
+                        <p className="text-[11px] mt-0.5" style={{ color: '#bbb' }}>
+                          Only activities tagged as &quot;Race&quot; in Strava appear here
+                        </p>
+                      </div>
                       <button
                         onClick={() => {
                           const unimported = stravaRaces.filter(r => !r.alreadyImported).map(r => r.stravaActivityId)
