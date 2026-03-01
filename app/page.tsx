@@ -51,12 +51,9 @@ export default async function LandingPage() {
         >
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2.5 rounded-2xl py-4 font-semibold text-white text-sm transition-opacity active:opacity-80"
+            className="w-full flex items-center justify-center rounded-2xl py-4 font-semibold text-white text-sm transition-opacity active:opacity-80"
             style={{ background: '#111', fontFamily: 'var(--font-grotesk)' }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="white" aria-hidden>
-              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
-            </svg>
             Create your Athlete Passport
           </button>
         </form>
