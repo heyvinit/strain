@@ -278,17 +278,18 @@ export default function PassportCard({
 
         {/* PBs */}
         {pbRows.length > 0 && (
-          <div className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[9px] font-bold tracking-widest mb-2.5" style={{ color: '#555' }}>PERSONAL BESTS</p>
-            <div className="flex flex-col gap-1.5">
-              {pbRows.map(pb => (
-                <div key={pb.label} className="flex items-center justify-between">
+          <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <p className="text-[9px] font-bold tracking-widest px-3 pt-3 pb-2" style={{ color: '#555' }}>PERSONAL BESTS</p>
+            {pbRows.map((pb, i) => (
+              <div key={pb.label}>
+                {i > 0 && <div style={{ height: 1, background: 'rgba(255,255,255,0.04)' }} />}
+                <div className="flex items-center justify-between px-3 py-2">
                   <span className="text-xs" style={{ color: '#666' }}>{pb.label}</span>
-                  <div className="flex-1 mx-3 border-b border-dashed" style={{ borderColor: '#2a2a2a' }} />
                   <span className="text-xs font-bold text-white">{formatTime(pb.value ?? null)}</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+            <div className="pb-1" />
           </div>
         )}
       </div>
