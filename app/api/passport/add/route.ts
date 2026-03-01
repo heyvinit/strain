@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
   if (insertError) {
     console.error('[passport/add error]', insertError)
-    return NextResponse.json({ success: false, error: 'Failed to save race' }, { status: 500 })
+    return NextResponse.json({ success: false, error: insertError.message ?? 'Failed to save race' }, { status: 500 })
   }
 
   await recalcPBs(user.id)
