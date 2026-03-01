@@ -218,12 +218,11 @@ export default function PassportCard({
           </div>
         </div>
 
-        {/* Stats: Completed | Upcoming | Countries */}
-        <div className="grid grid-cols-3 gap-2.5 mb-4">
+        {/* Stats: Completed | Upcoming */}
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
           {[
             { label: 'COMPLETED', value: String(stats.completed) },
             { label: 'UPCOMING', value: String(stats.upcoming) },
-            { label: 'COUNTRIES', value: String(flags.length || stats.countries.length) },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
               <p className="text-[9px] font-bold tracking-widest mb-1" style={{ color: '#555' }}>{label}</p>
