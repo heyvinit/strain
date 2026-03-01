@@ -31,7 +31,7 @@ export default async function LandingPage() {
         }}
       >
         {/* Strain logo */}
-        <img src="/strain-logo.svg" alt="Strain" className="h-5 w-auto opacity-30 self-start" />
+        <img src="/strain-logo.svg" alt="Strain" className="h-5 w-auto opacity-30 self-center" />
 
         {/* Interactive passport preview */}
         <MockPassport />

@@ -2,12 +2,12 @@
 
 import { useRef, useState } from 'react'
 
-const MRZ = 'STRAIN<<ALEX<MORGAN<<<ISSUEDMAR2026<<GETSTRAIN.APP'
+const MRZ = 'STRAIN<<MARCEL<HUG<<<<ISSUEDMAR2026<<GETSTRAIN.APP'
 
 const PBS = [
   { label: 'Marathon',      time: '3:12:44' },
   { label: 'Half Marathon', time: '1:28:31' },
-  { label: '10K',           time: '41:22' },
+  { label: 'Hyrox Mumbai',  time: '1:36:12' },
   { label: '5K',            time: '19:45' },
 ]
 
@@ -15,9 +15,8 @@ const FLAGS = [
   { country: 'USA',     flag: '🇺🇸' },
   { country: 'Germany', flag: '🇩🇪' },
   { country: 'Japan',   flag: '🇯🇵' },
-  { country: 'UK',      flag: '🇬🇧' },
-  { country: 'UAE',     flag: '🇦🇪' },
 ]
+const EXTRA_FLAGS = 2
 
 export default function MockPassport() {
   const ref = useRef<HTMLDivElement>(null)
@@ -89,16 +88,15 @@ export default function MockPassport() {
 
         {/* Identity */}
         <div className="flex items-center gap-3 mb-5">
-          {/* Avatar initials */}
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold text-white shrink-0"
-            style={{ background: 'linear-gradient(135deg, #FC4C02 0%, #c43900 100%)', border: '2px solid #222' }}
-          >
-            AM
-          </div>
+          <img
+            src="/avatar-marcel.jpg"
+            alt="Marcel Hug"
+            className="w-12 h-12 rounded-2xl object-cover shrink-0"
+            style={{ border: '2px solid #222' }}
+          />
           <div>
-            <p className="font-bold text-white text-lg leading-tight">Alex Morgan</p>
-            <p className="text-xs" style={{ color: '#555' }}>@alexruns</p>
+            <p className="font-bold text-white text-lg leading-tight">Marcel Hug</p>
+            <p className="text-xs" style={{ color: '#555' }}>@marcelhug</p>
           </div>
         </div>
 
@@ -135,6 +133,20 @@ export default function MockPassport() {
                   {f.flag}
                 </div>
               ))}
+              <div
+                className="flex items-center justify-center rounded-full text-[8px] font-bold"
+                style={{
+                  width: 22, height: 22,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1.5px solid #0e0e0e',
+                  marginLeft: -5,
+                  color: '#666',
+                  position: 'relative',
+                  zIndex: 0,
+                }}
+              >
+                +{EXTRA_FLAGS}
+              </div>
             </div>
           </div>
         </div>
