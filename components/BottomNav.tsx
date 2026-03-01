@@ -2,20 +2,20 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, BookOpen, Plus, Layers } from 'lucide-react'
+import { Home, BookOpen, Plus, LogOut } from 'lucide-react'
 
 interface BottomNavProps {
   username: string
+  logout: () => Promise<void>
 }
 
 const NAV = [
-  { href: '/dashboard', icon: Home, label: 'Home' },
-  { href: '#passport', icon: BookOpen, label: 'Passport' },
-  { href: '/dashboard/add', icon: Plus, label: 'Add' },
-  { href: '/', icon: Layers, label: 'Card' },
+  { href: '/dashboard', icon: Home,     label: 'Home'     },
+  { href: '/:username', icon: BookOpen, label: 'Passport' },
+  { href: '/dashboard/add', icon: Plus, label: 'Add'      },
 ]
 
-export default function BottomNav({ username }: BottomNavProps) {
+export default function BottomNav({ username, logout }: BottomNavProps) {
   const pathname = usePathname()
 
   return (
@@ -25,7 +25,6 @@ export default function BottomNav({ username }: BottomNavProps) {
         style={{ background: '#111', backdropFilter: 'blur(12px)' }}
       >
         {NAV.map(({ href, icon: Icon, label }) => {
-          // Passport links to the user's public page
           const target = label === 'Passport' ? `/${username}` : href
           const isActive = pathname === target || (label === 'Home' && pathname === '/dashboard')
 
@@ -33,7 +32,7 @@ export default function BottomNav({ username }: BottomNavProps) {
             <Link
               key={label}
               href={target}
-              className="flex flex-col items-center justify-center w-14 h-10 rounded-full transition-all"
+              className="flex items-center justify-center w-14 h-10 rounded-full transition-all active:scale-[0.93]"
               style={{
                 background: isActive ? '#FC4C02' : 'transparent',
                 color: isActive ? 'white' : '#666',
@@ -43,6 +42,17 @@ export default function BottomNav({ username }: BottomNavProps) {
             </Link>
           )
         })}
+
+        {/* Logout */}
+        <form action={logout}>
+          <button
+            type="submit"
+            className="flex items-center justify-center w-14 h-10 rounded-full transition-all active:scale-[0.93]"
+            style={{ color: '#444', background: 'transparent' }}
+          >
+            <LogOut size={18} strokeWidth={1.8} />
+          </button>
+        </form>
       </nav>
     </div>
   )
