@@ -118,63 +118,72 @@ export default async function DashboardPage() {
   const stats = computePassportStats(allRaces)
 
   return (
-    <div className="px-5 pt-14">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-sm" style={{ color: '#888' }}>Hello,</p>
-          <h1 className="text-3xl font-bold leading-tight" style={{ color: '#111' }}>
-            {firstName(user?.name)}
-          </h1>
-        </div>
-        <ShareButton username={session!.user.username} />
-      </div>
+    <div className="px-5 pt-14 pb-10 lg:px-12 lg:pt-12">
+      <div className="lg:flex lg:gap-10 lg:items-start">
 
-      {user && (
-        <PassportCard
-          user={user}
-          stats={stats}
-          username={session!.user.username}
-        />
-      )}
-
-      {/* Upcoming */}
-      {upcoming.length > 0 && (
-        <section className="mb-5">
-          <h2 className="text-xs font-semibold mb-3 tracking-wider uppercase" style={{ color: '#888' }}>Upcoming</h2>
-          <div className="flex flex-col gap-2">
-            {upcoming.map(r => <UpcomingRow key={r.id} race={r} />)}
+        {/* ── Left col: header + passport (sticky on desktop) ── */}
+        <div className="lg:w-[360px] lg:shrink-0 lg:sticky lg:top-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-sm" style={{ color: '#888' }}>Hello,</p>
+              <h1 className="text-3xl font-bold leading-tight" style={{ color: '#111' }}>
+                {firstName(user?.name)}
+              </h1>
+            </div>
+            <ShareButton username={session!.user.username} />
           </div>
-        </section>
-      )}
 
-      {/* Race history */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>Race History</h2>
-          {past.length > 0 && (
-            <Link href="/dashboard/add" className="text-xs font-semibold" style={{ color: '#FC4C02' }}>+ Add race</Link>
+          {user && (
+            <PassportCard
+              user={user}
+              stats={stats}
+              username={session!.user.username}
+            />
           )}
         </div>
 
-        {past.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            {past.map(race => <RaceRow key={race.id} race={race} />)}
-          </div>
-        ) : (
-          <Link href="/dashboard/add" className="block">
-            <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'white', border: '1px dashed #E0E0E0' }}>
-              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FFF5F2' }}>
-                <span style={{ color: '#FC4C02', fontSize: 18, fontWeight: 700 }}>+</span>
+        {/* ── Right col: upcoming + race history ── */}
+        <div className="lg:flex-1 lg:min-w-0">
+          {/* Upcoming */}
+          {upcoming.length > 0 && (
+            <section className="mb-5">
+              <h2 className="text-xs font-semibold mb-3 tracking-wider uppercase" style={{ color: '#888' }}>Upcoming</h2>
+              <div className="flex flex-col gap-2">
+                {upcoming.map(r => <UpcomingRow key={r.id} race={r} />)}
               </div>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: '#111' }}>Add your first race</p>
-                <p className="text-xs mt-0.5" style={{ color: '#aaa' }}>Paste a result link to get started</p>
-              </div>
+            </section>
+          )}
+
+          {/* Race history */}
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>Race History</h2>
+              {past.length > 0 && (
+                <Link href="/dashboard/add" className="text-xs font-semibold" style={{ color: '#FC4C02' }}>+ Add race</Link>
+              )}
             </div>
-          </Link>
-        )}
-      </section>
+
+            {past.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {past.map(race => <RaceRow key={race.id} race={race} />)}
+              </div>
+            ) : (
+              <Link href="/dashboard/add" className="block">
+                <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'white', border: '1px dashed #E0E0E0' }}>
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FFF5F2' }}>
+                    <span style={{ color: '#FC4C02', fontSize: 18, fontWeight: 700 }}>+</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: '#111' }}>Add your first race</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#aaa' }}>Paste a result link to get started</p>
+                  </div>
+                </div>
+              </Link>
+            )}
+          </section>
+        </div>
+
+      </div>
     </div>
   )
 }

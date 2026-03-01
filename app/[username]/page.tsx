@@ -118,36 +118,44 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
 
   return (
     <div className="min-h-screen" style={{ background: '#F8F8F7' }}>
-      <div className="px-5 pt-14 max-w-lg mx-auto">
-        {/* Passport card */}
-        <PassportCard
-          user={user}
-          stats={stats}
-          username={username}
-        />
+      <div className="px-5 pt-14 pb-10 lg:px-12 lg:pt-12">
+        <div className="lg:flex lg:gap-10 lg:items-start">
 
-        {/* Race history */}
-        {past.length > 0 && (
-          <section className="mb-10">
-            <h2 className="text-xs font-semibold mb-3 tracking-wider uppercase" style={{ color: '#888' }}>
-              Race History
-            </h2>
-            <div className="flex flex-col gap-2">
-              {past.map(race => <RaceRow key={race.id} race={race} />)}
+          {/* ── Left col: passport (sticky on desktop) ── */}
+          <div className="lg:w-[360px] lg:shrink-0 lg:sticky lg:top-10">
+            <PassportCard
+              user={user}
+              stats={stats}
+              username={username}
+            />
+
+            {/* CTA */}
+            <div className="pb-8 lg:pb-0 text-center">
+              <p className="text-xs mb-3" style={{ color: '#aaa' }}>Powered by Strain</p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold text-white"
+                style={{ background: '#FC4C02' }}
+              >
+                Create your own passport
+              </Link>
             </div>
-          </section>
-        )}
+          </div>
 
-        {/* CTA */}
-        <div className="pb-16 text-center">
-          <p className="text-xs mb-3" style={{ color: '#aaa' }}>Powered by Strain</p>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold text-white"
-            style={{ background: '#FC4C02' }}
-          >
-            Create your own passport
-          </Link>
+          {/* ── Right col: race history ── */}
+          {past.length > 0 && (
+            <div className="lg:flex-1 lg:min-w-0">
+              <section>
+                <h2 className="text-xs font-semibold mb-3 tracking-wider uppercase" style={{ color: '#888' }}>
+                  Race History
+                </h2>
+                <div className="flex flex-col gap-2">
+                  {past.map(race => <RaceRow key={race.id} race={race} />)}
+                </div>
+              </section>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
