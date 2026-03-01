@@ -38,7 +38,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.username = p.username
         token.avatar = p.profile_medium || p.profile || null
         token.stravaAccessToken = account.access_token
+        token.stravaRefreshToken = account.refresh_token
+        token.stravaTokenExpiresAt = account.expires_at  // Unix seconds
       }
+
+      // Refresh access token if it's expiring within 5 minutes
+      const expiresAt = token.stravaTokenExpiresAt as number | undefined
+      if (expiresAt && Date.now() / 1000 > expiresAt - 300) {
+        try {
+          const res = await fetch('https://www.strava.com/oauth/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              client_id: process.env.STRAVA_CLIENT_ID,
+              client_secret: process.env.STRAVA_CLIENT_SECRET,
+              grant_type: 'refresh_token',
+              refresh_token: token.stravaRefreshToken,
+            }),
+          })
+          if (res.ok) {
+            const refreshed = await res.json()
+            token.stravaAccessToken = refreshed.access_token
+            token.stravaRefreshToken = refreshed.refresh_token
+            token.stravaTokenExpiresAt = refreshed.expires_at
+          }
+        } catch { /* keep existing token */ }
+      }
+
       return token
     },
 
