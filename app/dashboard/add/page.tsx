@@ -2,14 +2,24 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Link2, PenLine, Loader2, CheckCircle2, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Link2, PenLine, Loader2, CheckCircle2, ChevronRight, Zap } from 'lucide-react'
 import Link from 'next/link'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 type TopTab = 'upcoming' | 'past'
-type PastMethod = null | 'url' | 'manual'
+type PastMethod = null | 'url' | 'manual' | 'strava'
 type UrlStep = 'input' | 'loading' | 'preview' | 'saving' | 'error'
+
+interface StravaRace {
+  stravaActivityId: number
+  name: string
+  date: string | null
+  distance: string
+  time: string
+  sport: string
+  alreadyImported: boolean
+}
 
 interface RacePreview {
   raceName: string
@@ -206,6 +216,14 @@ export default function AddRacePage() {
   const [manualSaving, setManualSaving] = useState(false)
   const [manualError, setManualError] = useState('')
 
+  // ── Strava import state ───────────────────────────────────────────────────────
+  const [stravaLoading, setStravaLoading] = useState(false)
+  const [stravaRaces, setStravaRaces] = useState<StravaRace[]>([])
+  const [stravaSelected, setStravaSelected] = useState<Set<number>>(new Set())
+  const [stravaError, setStravaError] = useState('')
+  const [stravaImporting, setStravaImporting] = useState(false)
+  const [stravaImported, setStravaImported] = useState(0)
+
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
   async function saveToPassport(payload: Record<string, unknown>) {
@@ -281,6 +299,61 @@ export default function AddRacePage() {
     } catch {
       setUrlError('Failed to save.')
       setUrlStep('error')
+    }
+  }
+
+  // ── Strava: fetch races ───────────────────────────────────────────────────────
+
+  async function handleStravaLoad() {
+    setStravaLoading(true)
+    setStravaError('')
+    setStravaRaces([])
+    setStravaSelected(new Set())
+    try {
+      const res = await fetch('/api/strava/races')
+      const json = await res.json()
+      if (!json.success) { setStravaError(json.error ?? 'Failed to load races.'); setStravaLoading(false); return }
+      setStravaRaces(json.races)
+    } catch {
+      setStravaError('Something went wrong.')
+    }
+    setStravaLoading(false)
+  }
+
+  function toggleStravaSelect(id: number) {
+    setStravaSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  async function handleStravaImport() {
+    if (stravaSelected.size === 0) return
+    setStravaImporting(true)
+    setStravaError('')
+    let count = 0
+    for (const race of stravaRaces.filter(r => stravaSelected.has(r.stravaActivityId))) {
+      try {
+        const json = await saveToPassport({
+          raceName: race.name,
+          raceDate: race.date,
+          sport: race.sport,
+          distance: race.distance,
+          netTime: race.time,
+          stravaActivityId: race.stravaActivityId,
+          platform: 'Strava',
+          runnerName: '',
+          status: 'completed',
+        })
+        if (json.success) count++
+      } catch { /* skip */ }
+    }
+    setStravaImported(count)
+    setStravaImporting(false)
+    if (count > 0) {
+      setDone(true)
+      setTimeout(() => router.push('/dashboard'), 1500)
     }
   }
 
@@ -442,11 +515,17 @@ export default function AddRacePage() {
                   title: 'Enter manually',
                   sub: 'Type in your race name, time and details',
                 },
+                {
+                  key: 'strava' as const,
+                  icon: <Zap size={18} style={{ color: '#FC4C02' }} />,
+                  title: 'Import from Strava',
+                  sub: 'Pull races you\'ve logged on Strava',
+                },
               ].map(opt => (
                 <button
                   key={opt.key}
-                  onClick={() => setPastMethod(opt.key)}
-                  className="flex items-center gap-4 rounded-3xl px-5 py-4 text-left"
+                  onClick={() => { setPastMethod(opt.key); if (opt.key === 'strava') handleStravaLoad() }}
+                  className="flex items-center gap-4 rounded-3xl px-5 py-4 text-left active:scale-[0.98] transition-transform duration-75"
                   style={{ background: 'white', border: '1px solid #F0F0EE' }}
                 >
                   <div
@@ -634,6 +713,131 @@ export default function AddRacePage() {
               </div>
             </form>
           )}
+          {/* ── Strava import flow ── */}
+          {pastMethod === 'strava' && (
+            <>
+              {stravaLoading && (
+                <div className="flex flex-col items-center py-24 gap-4">
+                  <Loader2 size={28} className="animate-spin" style={{ color: '#FC4C02' }} />
+                  <p className="text-sm" style={{ color: '#888' }}>Loading your Strava races...</p>
+                </div>
+              )}
+
+              {!stravaLoading && stravaError && (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm px-1" style={{ color: '#EF4444' }}>{stravaError}</p>
+                  <button
+                    onClick={() => setPastMethod(null)}
+                    className="w-full py-3 rounded-2xl text-sm font-medium"
+                    style={{ color: '#888', background: 'white', border: '1px solid #F0F0EE' }}
+                  >
+                    Go back
+                  </button>
+                </div>
+              )}
+
+              {!stravaLoading && !stravaError && stravaRaces.length === 0 && (
+                <div className="flex flex-col gap-3 items-center py-16">
+                  <p className="text-sm" style={{ color: '#888' }}>No races found on Strava.</p>
+                  <p className="text-xs text-center px-4" style={{ color: '#bbb' }}>
+                    Strava only marks activities as races when you set the workout type to "Race" in the app.
+                  </p>
+                  <button onClick={() => setPastMethod(null)} className="text-sm font-medium" style={{ color: '#FC4C02' }}>
+                    Go back
+                  </button>
+                </div>
+              )}
+
+              {!stravaLoading && !stravaError && stravaRaces.length > 0 && (
+                <div>
+                  <div className="rounded-3xl overflow-hidden mb-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
+                    <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+                      <p className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>
+                        {stravaRaces.length} race{stravaRaces.length !== 1 ? 's' : ''} found
+                      </p>
+                      <button
+                        onClick={() => {
+                          const unimported = stravaRaces.filter(r => !r.alreadyImported).map(r => r.stravaActivityId)
+                          setStravaSelected(new Set(unimported))
+                        }}
+                        className="text-xs font-semibold"
+                        style={{ color: '#FC4C02' }}
+                      >
+                        Select all
+                      </button>
+                    </div>
+
+                    {stravaRaces.map((race, i) => (
+                      <div key={race.stravaActivityId}>
+                        {i > 0 && <div style={{ height: 1, background: '#F0F0EE' }} />}
+                        <button
+                          onClick={() => !race.alreadyImported && toggleStravaSelect(race.stravaActivityId)}
+                          className="w-full flex items-center gap-3 px-5 py-3.5 text-left"
+                          style={{ opacity: race.alreadyImported ? 0.4 : 1 }}
+                        >
+                          {/* Checkbox */}
+                          <div
+                            className="w-5 h-5 rounded-md shrink-0 flex items-center justify-center"
+                            style={{
+                              background: race.alreadyImported ? '#F0F0EE' :
+                                stravaSelected.has(race.stravaActivityId) ? '#FC4C02' : 'white',
+                              border: `1.5px solid ${race.alreadyImported ? '#E0E0E0' :
+                                stravaSelected.has(race.stravaActivityId) ? '#FC4C02' : '#E0E0E0'}`,
+                            }}
+                          >
+                            {(stravaSelected.has(race.stravaActivityId) || race.alreadyImported) && (
+                              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold truncate" style={{ color: '#111' }}>{race.name}</p>
+                            <p className="text-xs mt-0.5" style={{ color: '#888' }}>
+                              {race.date ?? '—'} · {race.distance}
+                              {race.alreadyImported && <span style={{ color: '#bbb' }}> · already added</span>}
+                            </p>
+                          </div>
+
+                          <span className="text-sm font-bold shrink-0" style={{ color: '#111' }}>{race.time}</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {stravaError && (
+                    <p className="text-sm mb-3 px-1" style={{ color: '#EF4444' }}>{stravaError}</p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPastMethod(null)}
+                      className="w-12 flex items-center justify-center rounded-2xl"
+                      style={{ background: 'white', border: '1px solid #F0F0EE' }}
+                    >
+                      <ArrowLeft size={15} color="#888" />
+                    </button>
+                    <button
+                      onClick={handleStravaImport}
+                      disabled={stravaSelected.size === 0 || stravaImporting}
+                      className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-white text-sm font-semibold disabled:opacity-40"
+                      style={{ background: '#FC4C02' }}
+                    >
+                      {stravaImporting ? <Loader2 size={16} className="animate-spin" /> : <Zap size={15} />}
+                      {stravaImporting
+                        ? 'Importing...'
+                        : stravaSelected.size > 0
+                          ? `Import ${stravaSelected.size} race${stravaSelected.size !== 1 ? 's' : ''}`
+                          : 'Select races to import'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
         </div>
       )}
     </div>

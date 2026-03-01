@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
     raceName, raceDate, runnerName, bibNumber, distance,
     netTime, gunTime, pace, overallPosition, categoryPosition,
     category, platform, result_url, status, sport, country,
+    stravaActivityId,
   } = body
 
   if (!raceName || !distance) {
@@ -70,6 +71,7 @@ export async function POST(req: NextRequest) {
       sport: ['running','hyrox','triathlon','ocr','cycling','other'].includes(sport) ? sport : 'running',
       result_url: result_url || null,
       country: country || null,
+      strava_activity_id: stravaActivityId || null,
       status: status === 'upcoming' ? 'upcoming' : 'completed',
     })
     .select()

@@ -5,6 +5,7 @@ declare module 'next-auth' {
     user: {
       stravaId: number
       username: string
+      stravaAccessToken: string
     } & DefaultSession['user']
   }
 }

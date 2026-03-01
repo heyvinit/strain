@@ -47,6 +47,7 @@ export interface DbUserRace {
   category: string | null
   result_url: string | null
   timing_platform: string | null
+  strava_activity_id: number | null
   status: 'upcoming' | 'completed'
   is_pb: boolean
   pre_race_email_sent: boolean

@@ -37,6 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.stravaId = Number(p.id)
         token.username = p.username
         token.avatar = p.profile_medium || p.profile || null
+        token.stravaAccessToken = account.access_token
       }
       return token
     },
@@ -45,6 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.stravaId = token.stravaId as number
       session.user.username = token.username as string
       session.user.image = (token.avatar as string) ?? session.user.image
+      session.user.stravaAccessToken = token.stravaAccessToken as string
       return session
     },
   },
