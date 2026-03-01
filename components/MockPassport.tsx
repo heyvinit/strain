@@ -113,19 +113,19 @@ export default function MockPassport() {
           ))}
 
           {/* Countries */}
-          <div className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <div className="rounded-2xl p-3 overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
             <p className="text-[9px] font-bold tracking-widest mb-1.5" style={{ color: '#555' }}>COUNTRIES</p>
-            <div className="flex items-center" style={{ gap: 0 }}>
+            <div className="flex items-center flex-nowrap">
               {FLAGS.map((f, i) => (
                 <div
                   key={f.country}
-                  className="flex items-center justify-center rounded-full"
+                  className="flex items-center justify-center rounded-full shrink-0"
                   style={{
-                    width: 22, height: 22,
+                    width: 18, height: 18,
                     background: 'rgba(255,255,255,0.06)',
                     border: '1.5px solid #0e0e0e',
-                    marginLeft: i > 0 ? -5 : 0,
-                    fontSize: 13, lineHeight: 1,
+                    marginLeft: i > 0 ? -4 : 0,
+                    fontSize: 11, lineHeight: 1,
                     zIndex: FLAGS.length - i,
                     position: 'relative',
                   }}
@@ -134,13 +134,13 @@ export default function MockPassport() {
                 </div>
               ))}
               <div
-                className="flex items-center justify-center rounded-full text-[8px] font-bold"
+                className="flex items-center justify-center rounded-full text-[7px] font-bold shrink-0"
                 style={{
-                  width: 22, height: 22,
-                  background: 'rgba(255,255,255,0.06)',
+                  width: 18, height: 18,
+                  background: 'rgba(255,255,255,0.08)',
                   border: '1.5px solid #0e0e0e',
-                  marginLeft: -5,
-                  color: '#666',
+                  marginLeft: -4,
+                  color: '#888',
                   position: 'relative',
                   zIndex: 0,
                 }}

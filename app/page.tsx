@@ -39,7 +39,7 @@ export default async function LandingPage() {
         {/* One-liner description */}
         <p className="text-sm leading-relaxed text-center" style={{ color: '#666', fontFamily: 'var(--font-grotesk)' }}>
           Every race you&apos;ve ever run, in one passport. Track your times,
-          personal bests, and countries — then share it with the world.
+          personal bests, and countries. Then share it with the world.
         </p>
 
         {/* Single CTA */}
