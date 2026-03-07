@@ -5,22 +5,15 @@ import type { DbUserRace } from '@/lib/supabase'
 import { recalcPBs } from '@/lib/pb'
 import type { RaceData } from '@/lib/types'
 
-async function getOwner(raceId: string, stravaId: number) {
-  const { data: user } = await supabaseAdmin
-    .from('users')
-    .select('id')
-    .eq('strava_id', stravaId)
-    .single()
-  if (!user) return null
-
+async function getOwner(raceId: string, userId: string) {
   const { data: race } = await supabaseAdmin
     .from('user_races')
     .select('id, user_id')
     .eq('id', raceId)
     .single()
-  if (!race || race.user_id !== user.id) return null
+  if (!race || race.user_id !== userId) return null
 
-  return { userId: user.id }
+  return { userId }
 }
 
 function parseDate(raw: string): string | null {
@@ -55,13 +48,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (!race) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   // Verify ownership
-  const { data: user } = await supabaseAdmin
-    .from('users')
-    .select('id')
-    .eq('strava_id', session.user.stravaId)
-    .single()
-
-  if (!user || user.id !== race.user_id) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (session.user.userId !== race.user_id) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const raceData: RaceData = {
     raceName: race.race_name,
@@ -86,7 +73,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!session?.user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
   const { id } = await params
-  const owner = await getOwner(id, session.user.stravaId)
+  const owner = await getOwner(id, session.user.userId)
   if (!owner) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const body = await req.json()
@@ -125,7 +112,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (!session?.user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
   const { id } = await params
-  const owner = await getOwner(id, session.user.stravaId)
+  const owner = await getOwner(id, session.user.userId)
   if (!owner) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const { error } = await supabaseAdmin

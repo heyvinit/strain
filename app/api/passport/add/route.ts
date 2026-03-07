@@ -41,21 +41,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 })
   }
 
-  // Get user from DB
-  const { data: user, error: userError } = await supabaseAdmin
-    .from('users')
-    .select('id')
-    .eq('strava_id', session.user.stravaId)
-    .single()
-
-  if (userError || !user) {
-    return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 })
-  }
-
   const { data: race, error: insertError } = await supabaseAdmin
     .from('user_races')
     .insert({
-      user_id: user.id,
+      user_id: session.user.userId,
       race_name: raceName,
       race_date: parseDate(raceDate),
       distance,
@@ -82,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: insertError.message ?? 'Failed to save race' }, { status: 500 })
   }
 
-  await recalcPBs(user.id)
+  await recalcPBs(session.user.userId)
 
   return NextResponse.json({ success: true, race })
 }

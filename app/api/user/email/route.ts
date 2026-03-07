@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest) {
   const { error } = await supabaseAdmin
     .from('users')
     .update({ email })
-    .eq('strava_id', session.user.stravaId)
+    .eq('id', session.user.userId)
 
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
 

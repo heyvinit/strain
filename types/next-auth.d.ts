@@ -3,9 +3,10 @@ import { DefaultSession } from 'next-auth'
 declare module 'next-auth' {
   interface Session {
     user: {
-      stravaId: number
+      userId: string
+      stravaId?: number
       username: string
-      stravaAccessToken: string
+      stravaAccessToken?: string
     } & DefaultSession['user']
   }
 }

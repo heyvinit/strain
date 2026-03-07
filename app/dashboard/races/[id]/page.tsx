@@ -39,13 +39,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
   if (!race) notFound()
 
-  const { data: owner } = await supabaseAdmin
-    .from('users')
-    .select('id')
-    .eq('strava_id', session!.user.stravaId)
-    .single()
-
-  const isOwner = owner?.id === race.user_id
+  const isOwner = session?.user.userId === race.user_id
 
   const statRows = [
     { label: 'Distance', value: distanceLabel(race.distance) },

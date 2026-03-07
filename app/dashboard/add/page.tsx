@@ -517,28 +517,44 @@ export default function AddRacePage() {
                 },
                 {
                   key: 'strava' as const,
-                  icon: <Zap size={18} style={{ color: '#FC4C02' }} />,
+                  icon: <Zap size={18} style={{ color: '#aaa' }} />,
                   title: 'Import from Strava',
                   sub: 'Pull races you\'ve logged on Strava',
+                  comingSoon: true,
                 },
               ].map(opt => (
                 <button
                   key={opt.key}
-                  onClick={() => { setPastMethod(opt.key); if (opt.key === 'strava') handleStravaLoad() }}
-                  className="flex items-center gap-4 rounded-3xl px-5 py-4 text-left active:scale-[0.98] transition-transform duration-75"
-                  style={{ background: 'white', border: '1px solid #F0F0EE' }}
+                  onClick={() => { if (!('comingSoon' in opt && opt.comingSoon)) { setPastMethod(opt.key); if (opt.key === 'strava') handleStravaLoad() } }}
+                  disabled={'comingSoon' in opt && opt.comingSoon}
+                  className="relative flex items-center gap-4 rounded-3xl px-5 py-4 text-left transition-transform duration-75"
+                  style={{
+                    background: 'white', border: '1px solid #F0F0EE',
+                    opacity: 'comingSoon' in opt && opt.comingSoon ? 0.5 : 1,
+                    cursor: 'comingSoon' in opt && opt.comingSoon ? 'not-allowed' : 'pointer',
+                  }}
                 >
                   <div
                     className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: '#FFF5F2' }}
+                    style={{ background: 'comingSoon' in opt && opt.comingSoon ? '#F5F5F5' : '#FFF5F2' }}
                   >
                     {opt.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm" style={{ color: '#111' }}>{opt.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-sm" style={{ color: '#111' }}>{opt.title}</p>
+                      {'comingSoon' in opt && opt.comingSoon && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#111', color: 'white' }}>
+                          Soon
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs mt-0.5 truncate" style={{ color: '#aaa' }}>{opt.sub}</p>
                   </div>
-                  <ChevronRight size={16} color="#ccc" />
+                  {'comingSoon' in opt && opt.comingSoon
+                    ? <span />
+                    : <ChevronRight size={16} color="#ccc" />
+                  }
                 </button>
               ))}
             </>

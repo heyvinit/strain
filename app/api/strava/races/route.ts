@@ -62,16 +62,11 @@ export async function GET() {
   const raceActivities = activities.filter((a: { workout_type: number }) => a.workout_type === RACE_TYPE)
 
   // Get already-imported Strava activity IDs for this user
-  const { data: user } = await supabaseAdmin
-    .from('users').select('id').eq('strava_id', session.user.stravaId).single()
-
-  const { data: existing } = user
-    ? await supabaseAdmin
-        .from('user_races')
-        .select('strava_activity_id')
-        .eq('user_id', user.id)
-        .not('strava_activity_id', 'is', null)
-    : { data: [] }
+  const { data: existing } = await supabaseAdmin
+    .from('user_races')
+    .select('strava_activity_id')
+    .eq('user_id', session.user.userId)
+    .not('strava_activity_id', 'is', null)
 
   const importedIds = new Set((existing ?? []).map((r: { strava_activity_id: number }) => r.strava_activity_id))
 

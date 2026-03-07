@@ -12,7 +12,7 @@ export default async function ProfilePage() {
   const { data: user } = await supabaseAdmin
     .from('users')
     .select('name, username, avatar_url, email, email_pre_race, email_post_race')
-    .eq('strava_id', session.user.stravaId)
+    .eq('id', session.user.userId)
     .single()
 
   if (!user) redirect('/dashboard')

@@ -46,7 +46,7 @@ export default async function LandingPage() {
         <form
           action={async () => {
             'use server'
-            await signIn('strava', { redirectTo: '/dashboard' })
+            await signIn('google', { redirectTo: '/dashboard' })
           }}
         >
           <button

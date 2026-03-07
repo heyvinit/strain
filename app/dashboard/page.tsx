@@ -104,7 +104,7 @@ export default async function DashboardPage() {
 
   const { data: user } = await supabaseAdmin
     .from('users').select('*')
-    .eq('strava_id', session!.user.stravaId)
+    .eq('id', session!.user.userId)
     .single<DbUser>()
 
   const { data: races } = await supabaseAdmin

@@ -16,7 +16,8 @@ export const supabaseAdmin = createClient(
 
 export interface DbUser {
   id: string
-  strava_id: number
+  strava_id: number | null
+  google_id: string | null
   username: string
   name: string | null
   avatar_url: string | null
