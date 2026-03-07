@@ -54,24 +54,22 @@ export default async function LoginPage() {
           </form>
 
           {/* Strava (coming soon) */}
-          <div className="relative">
-            <button
-              disabled
-              className="w-full flex items-center justify-center gap-3 rounded-2xl py-4 font-semibold text-white text-sm opacity-40 cursor-not-allowed"
-              style={{ background: '#FC4C02' }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
-              </svg>
-              Continue with Strava
-            </button>
+          <button
+            disabled
+            className="w-full flex items-center justify-center gap-3 rounded-2xl py-4 font-semibold text-white text-sm opacity-40 cursor-not-allowed"
+            style={{ background: '#FC4C02' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+            </svg>
+            Continue with Strava
             <span
-              className="absolute -top-2 -right-2 text-[10px] font-bold px-2 py-0.5 rounded-full"
-              style={{ background: '#111', color: 'white' }}
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.25)', color: 'white' }}
             >
               Soon
             </span>
-          </div>
+          </button>
         </div>
 
         <p className="text-xs mt-6 text-center" style={{ color: '#bbb' }}>
