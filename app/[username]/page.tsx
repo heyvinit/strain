@@ -48,12 +48,12 @@ function formatDate(d: string | null): { month: string; day: string } {
 function UpcomingRow({ race }: { race: DbUserRace }) {
   const { month, day } = formatDate(race.race_date)
   return (
-    <div className="flex items-center gap-4 rounded-2xl px-4 py-3.5" style={{ background: 'rgba(252,76,2,0.12)', border: '1px solid rgba(252,76,2,0.2)' }}>
+    <div className="flex items-center gap-4 rounded-2xl px-4 py-3.5" style={{ background: 'rgba(18,6,2,0.75)', border: '1px solid rgba(252,76,2,0.35)', backdropFilter: 'blur(12px)' }}>
       <div className="flex flex-col items-center w-9 shrink-0">
         <span className="text-[10px] font-semibold" style={{ color: '#FC4C02' }}>{month}</span>
         <span className="text-xl font-bold leading-tight" style={{ color: '#FC4C02' }}>{day}</span>
       </div>
-      <div className="w-px self-stretch" style={{ background: 'rgba(252,76,2,0.2)' }} />
+      <div className="w-px self-stretch" style={{ background: 'rgba(252,76,2,0.25)' }} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate text-white">{race.race_name}</p>
         <p className="text-xs mt-0.5" style={{ color: '#FC4C02' }}>Upcoming · {sportDistanceLabel(race.sport, race.distance)}</p>
@@ -65,15 +65,15 @@ function UpcomingRow({ race }: { race: DbUserRace }) {
 function RaceRow({ race }: { race: DbUserRace }) {
   const { month, day } = formatDate(race.race_date)
   const Inner = (
-    <div className="flex items-center gap-4 rounded-2xl px-4 py-3.5" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <div className="flex items-center gap-4 rounded-2xl px-4 py-3.5" style={{ background: 'rgba(12,12,12,0.75)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)' }}>
       <div className="flex flex-col items-center w-9 shrink-0">
-        <span className="text-[10px] font-semibold" style={{ color: '#555' }}>{month}</span>
+        <span className="text-[10px] font-semibold" style={{ color: '#666' }}>{month}</span>
         <span className="text-xl font-bold leading-tight text-white">{day}</span>
       </div>
-      <div className="w-px self-stretch" style={{ background: 'rgba(255,255,255,0.08)' }} />
+      <div className="w-px self-stretch" style={{ background: 'rgba(255,255,255,0.1)' }} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate text-white">{race.race_name}</p>
-        <p className="text-xs mt-0.5" style={{ color: '#555' }}>{sportDistanceLabel(race.sport, race.distance)}</p>
+        <p className="text-xs mt-0.5" style={{ color: '#666' }}>{sportDistanceLabel(race.sport, race.distance)}</p>
       </div>
       <div className="flex flex-col items-end shrink-0">
         <span className="text-sm font-bold text-white">{formatTime(race.net_time)}</span>
@@ -81,7 +81,7 @@ function RaceRow({ race }: { race: DbUserRace }) {
           <span className="text-[10px] font-bold mt-0.5" style={{ color: '#FC4C02' }}>PB</span>
         )}
       </div>
-      {race.result_url && <ChevronRight size={14} color="#444" />}
+      {race.result_url && <ChevronRight size={14} color="#555" />}
     </div>
   )
 
@@ -170,7 +170,7 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
 
               {upcoming.length > 0 && (
                 <section>
-                  <h2 className="text-[11px] font-semibold mb-3 tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <h2 className="text-[11px] font-semibold mb-3 tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     Upcoming
                   </h2>
                   <div className="flex flex-col gap-2">
@@ -181,7 +181,7 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
 
               {past.length > 0 && (
                 <section>
-                  <h2 className="text-[11px] font-semibold mb-3 tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <h2 className="text-[11px] font-semibold mb-3 tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     Race History
                   </h2>
                   <div className="flex flex-col gap-2">
