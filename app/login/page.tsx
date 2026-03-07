@@ -15,13 +15,17 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Sign in card */}
         <div className="w-full bg-white rounded-3xl p-6 shadow-sm" style={{ border: '1px solid #F0F0EE' }}>
-          {/* Logo inside card */}
-          <div className="flex flex-col items-center mb-6">
-            <img src="/strain-logo.svg" alt="Strain" className="h-6 w-auto mb-5" />
-            <h1 className="text-xl font-bold mb-1 text-center" style={{ color: '#111' }}>
+          {/* Logo */}
+          <div className="flex justify-center pb-5 mb-5" style={{ borderBottom: '1px solid #F0F0EE' }}>
+            <img src="/strain-logo.svg" alt="Strain" className="h-6 w-auto" />
+          </div>
+
+          {/* Heading */}
+          <div className="text-center mb-6">
+            <h1 className="text-xl font-bold mb-2" style={{ color: '#111' }}>
               Welcome to Strain
             </h1>
-            <p className="text-sm text-center" style={{ color: '#888' }}>
+            <p className="text-sm leading-relaxed" style={{ color: '#888' }}>
               Sign in to build your athlete passport and track every event.
             </p>
           </div>
