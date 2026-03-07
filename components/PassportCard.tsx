@@ -154,17 +154,27 @@ export default function PassportCard({
   user,
   stats,
   username,
+  isOwner = false,
 }: {
   user: DbUser
   stats: PassportStats
   username: string
+  isOwner?: boolean
 }) {
-  const pbRows = [
-    { label: 'Marathon', value: stats.pbs.fm },
+  const PB_SLOTS = [
+    { label: 'Marathon',      value: stats.pbs.fm },
     { label: 'Half Marathon', value: stats.pbs.hm },
-    { label: '10K', value: stats.pbs['10k'] },
-    { label: '5K', value: stats.pbs['5k'] },
-  ].filter(pb => pb.value)
+    { label: '10K',           value: stats.pbs['10k'] },
+    { label: '5K',            value: stats.pbs['5k'] },
+    { label: 'Hyrox',         value: undefined },
+  ]
+
+  // Public: only show rows that have a time. Owner: show all slots.
+  const pbRows = isOwner
+    ? PB_SLOTS
+    : PB_SLOTS.filter(pb => pb.value)
+
+  const hasPbs = PB_SLOTS.some(pb => pb.value)
 
   // Country flags
   const flags = stats.countries
@@ -278,16 +288,21 @@ export default function PassportCard({
           </div>
         </div>
 
-        {/* PBs */}
-        {pbRows.length > 0 && (
+        {/* PBs — always shown to owner, only filled rows shown publicly */}
+        {(isOwner || hasPbs) && pbRows.length > 0 && (
           <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
             <p className="text-[9px] font-bold tracking-widest px-3 pt-3 pb-2" style={{ color: '#555' }}>PERSONAL BESTS</p>
             {pbRows.map((pb, i) => (
               <div key={pb.label}>
                 {i > 0 && <div style={{ height: 1, background: 'rgba(255,255,255,0.04)' }} />}
                 <div className="flex items-center justify-between px-3 py-2">
-                  <span className="text-xs" style={{ color: '#666' }}>{pb.label}</span>
-                  <span className="text-xs font-bold text-white">{formatTime(pb.value ?? null)}</span>
+                  <span className="text-xs" style={{ color: pb.value ? '#666' : '#333' }}>{pb.label}</span>
+                  <span
+                    className="text-xs font-bold tabular-nums"
+                    style={{ color: pb.value ? 'white' : '#2e2e2e' }}
+                  >
+                    {pb.value ? formatTime(pb.value) : '—:——:——'}
+                  </span>
                 </div>
               </div>
             ))}

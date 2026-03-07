@@ -143,6 +143,7 @@ export default async function DashboardPage() {
               user={user}
               stats={stats}
               username={session!.user.username}
+              isOwner
             />
           )}
         </div>
