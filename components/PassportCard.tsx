@@ -164,14 +164,16 @@ export default function PassportCard({
   const PB_SLOTS = [
     { label: 'Marathon',      value: stats.pbs.fm },
     { label: 'Half Marathon', value: stats.pbs.hm },
+    { label: 'Hyrox',         value: undefined },
     { label: '10K',           value: stats.pbs['10k'] },
     { label: '5K',            value: stats.pbs['5k'] },
-    { label: 'Hyrox',         value: undefined },
   ]
 
-  // Public: only show rows that have a time. Owner: show all slots.
+  const ALWAYS_SHOW = new Set(['Marathon', 'Half Marathon', 'Hyrox'])
+
+  // Public: only rows with a time. Owner: always show top 3, show 10K/5K only if they have a time.
   const pbRows = isOwner
-    ? PB_SLOTS
+    ? PB_SLOTS.filter(pb => ALWAYS_SHOW.has(pb.label) || pb.value)
     : PB_SLOTS.filter(pb => pb.value)
 
   const hasPbs = PB_SLOTS.some(pb => pb.value)
