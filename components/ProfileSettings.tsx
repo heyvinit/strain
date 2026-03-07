@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Pencil, Check, X } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Pencil, Camera, Loader2 } from 'lucide-react'
 import { logout } from '@/app/actions'
 
 interface Props {
@@ -36,6 +36,12 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
 }
 
 export default function ProfileSettings({ name, username, avatarUrl, email, emailPreRace, emailPostRace }: Props) {
+  // Avatar
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [currentAvatar, setCurrentAvatar] = useState(avatarUrl)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState('')
+
   // Email edit
   const [editingEmail, setEditingEmail] = useState(false)
   const [emailValue, setEmailValue] = useState(email ?? '')
@@ -46,6 +52,24 @@ export default function ProfileSettings({ name, username, avatarUrl, email, emai
   const [preRace, setPreRace] = useState(emailPreRace)
   const [postRace, setPostRace] = useState(emailPostRace)
   const [prefSaving, setPrefSaving] = useState(false)
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarUploading(true)
+    setAvatarError('')
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      const res = await fetch('/api/user/avatar', { method: 'POST', body: form })
+      const json = await res.json()
+      if (!json.success) { setAvatarError(json.error ?? 'Upload failed'); setAvatarUploading(false); return }
+      setCurrentAvatar(json.avatarUrl)
+    } catch {
+      setAvatarError('Something went wrong')
+    }
+    setAvatarUploading(false)
+  }
 
   async function saveEmail() {
     if (!emailValue.includes('@')) { setEmailError('Enter a valid email'); return }
@@ -79,32 +103,71 @@ export default function ProfileSettings({ name, username, avatarUrl, email, emai
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Identity */}
-      <div
-        className="rounded-3xl p-5 flex items-center gap-4"
-        style={{ background: 'white', border: '1px solid #F0F0EE' }}
-      >
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={name ?? ''} className="w-14 h-14 rounded-2xl object-cover shrink-0" />
-        ) : (
+
+      {/* Identity + photo upload */}
+      <div className="rounded-3xl p-5 flex items-center gap-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
+        {/* Tappable avatar */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={avatarUploading}
+          className="relative shrink-0 group"
+        >
+          {currentAvatar ? (
+            <img src={currentAvatar} alt={name ?? ''} className="w-14 h-14 rounded-2xl object-cover" />
+          ) : (
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg"
+              style={{ background: '#FC4C02' }}
+            >
+              {(name ?? username)[0]?.toUpperCase()}
+            </div>
+          )}
+          {/* Camera overlay */}
           <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shrink-0"
-            style={{ background: '#FC4C02' }}
+            className="absolute inset-0 rounded-2xl flex items-center justify-center transition-opacity"
+            style={{ background: 'rgba(0,0,0,0.45)', opacity: avatarUploading ? 1 : 0 }}
           >
-            {(name ?? username)[0]?.toUpperCase()}
+            {avatarUploading
+              ? <Loader2 size={16} color="white" className="animate-spin" />
+              : <Camera size={16} color="white" />
+            }
           </div>
-        )}
-        <div>
-          <p className="font-bold text-lg leading-tight" style={{ color: '#111' }}>{name ?? username}</p>
+          <div
+            className="absolute inset-0 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity"
+            style={{ background: 'rgba(0,0,0,0.4)' }}
+          >
+            <Camera size={16} color="white" />
+          </div>
+        </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={handleAvatarChange}
+        />
+
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-lg leading-tight truncate" style={{ color: '#111' }}>{name ?? username}</p>
           <p className="text-sm" style={{ color: '#aaa' }}>@{username}</p>
+          {avatarError && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{avatarError}</p>}
+          {!avatarUploading && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-xs mt-1 font-medium"
+              style={{ color: '#FC4C02' }}
+            >
+              Change photo
+            </button>
+          )}
         </div>
       </div>
 
       {/* Email */}
-      <div
-        className="rounded-3xl p-5"
-        style={{ background: 'white', border: '1px solid #F0F0EE' }}
-      >
+      <div className="rounded-3xl p-5" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
         <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: '#aaa' }}>Email</p>
 
         {editingEmail ? (
@@ -154,27 +217,14 @@ export default function ProfileSettings({ name, username, avatarUrl, email, emai
       </div>
 
       {/* Notifications */}
-      <div
-        className="rounded-3xl overflow-hidden"
-        style={{ background: 'white', border: '1px solid #F0F0EE' }}
-      >
+      <div className="rounded-3xl overflow-hidden" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
         <p className="text-[10px] font-bold tracking-widest uppercase px-5 pt-5 pb-3" style={{ color: '#aaa' }}>
           Notifications
         </p>
 
         {[
-          {
-            key: 'pre' as const,
-            label: 'Pre-race reminder',
-            sub: '2 days before your race',
-            value: preRace,
-          },
-          {
-            key: 'post' as const,
-            label: 'Post-race follow-up',
-            sub: 'Day after your event',
-            value: postRace,
-          },
+          { key: 'pre' as const, label: 'Pre-race reminder', sub: '2 days before your race', value: preRace },
+          { key: 'post' as const, label: 'Post-race follow-up', sub: 'Day after your event', value: postRace },
         ].map((item, i) => (
           <div key={item.key}>
             {i > 0 && <div style={{ height: 1, background: '#F0F0EE', marginLeft: 20 }} />}
@@ -183,11 +233,7 @@ export default function ProfileSettings({ name, username, avatarUrl, email, emai
                 <p className="text-sm font-medium" style={{ color: '#111' }}>{item.label}</p>
                 <p className="text-xs mt-0.5" style={{ color: '#aaa' }}>{item.sub}</p>
               </div>
-              <Toggle
-                checked={item.value}
-                onChange={v => togglePref(item.key, v)}
-                disabled={prefSaving || !hasEmail}
-              />
+              <Toggle checked={item.value} onChange={v => togglePref(item.key, v)} disabled={prefSaving || !hasEmail} />
             </div>
           </div>
         ))}
@@ -209,6 +255,18 @@ export default function ProfileSettings({ name, username, avatarUrl, email, emai
           Sign out
         </button>
       </form>
+
+      {/* Blog link */}
+      <div className="text-center pb-2">
+        <a
+          href="/blog"
+          className="text-xs"
+          style={{ color: '#bbb' }}
+        >
+          Race tips &amp; guides →
+        </a>
+      </div>
+
     </div>
   )
 }
