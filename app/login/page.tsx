@@ -12,23 +12,19 @@ export default async function LoginPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-6"
       style={{ background: '#F8F8F7' }}>
 
-      <div className="w-full max-w-sm flex flex-col items-center">
-        {/* Logo */}
-        <img src="/strain-logo.svg" alt="Strain" className="h-7 w-auto mb-3" />
-
-        {/* Tagline */}
-        <p className="text-sm mb-16" style={{ color: '#888' }}>
-          Your athlete passport
-        </p>
-
+      <div className="w-full max-w-sm">
         {/* Sign in card */}
         <div className="w-full bg-white rounded-3xl p-6 shadow-sm" style={{ border: '1px solid #F0F0EE' }}>
-          <h1 className="text-xl font-bold mb-1" style={{ color: '#111' }}>
-            Welcome to Strain
-          </h1>
-          <p className="text-sm mb-6" style={{ color: '#888' }}>
-            Sign in to build your athlete passport and track every event.
-          </p>
+          {/* Logo inside card */}
+          <div className="flex flex-col items-center mb-6">
+            <img src="/strain-logo.svg" alt="Strain" className="h-6 w-auto mb-5" />
+            <h1 className="text-xl font-bold mb-1 text-center" style={{ color: '#111' }}>
+              Welcome to Strain
+            </h1>
+            <p className="text-sm text-center" style={{ color: '#888' }}>
+              Sign in to build your athlete passport and track every event.
+            </p>
+          </div>
 
           {/* Google (primary) */}
           <form
