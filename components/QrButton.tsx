@@ -1,25 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, QrCode } from 'lucide-react'
 
 export default function QrButton({ qrSvg }: { qrSvg: string }) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      {/* Small inline QR — transparent, subtle */}
+      {/* QR icon trigger — clean, doesn't disrupt passport design */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="shrink-0 rounded-md overflow-hidden"
-        style={{ width: 32, height: 32, opacity: 0.5 }}
-        title="Tap to enlarge"
+        className="shrink-0 flex items-center justify-center"
+        style={{ width: 28, height: 28, opacity: 0.35 }}
+        title="View QR code"
       >
-        <div
-          style={{ width: '100%', height: '100%' }}
-          dangerouslySetInnerHTML={{ __html: qrSvg }}
-        />
+        <QrCode size={18} color="#ffffff" />
       </button>
 
       {/* Modal */}
@@ -47,11 +44,8 @@ export default function QrButton({ qrSvg }: { qrSvg: string }) {
               Athlete Passport
             </p>
 
-            {/* Large QR — white bg for scannability */}
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{ width: 200, height: 200, background: 'white', padding: 10 }}
-            >
+            {/* Large QR — white bg, sharp corners for clean look */}
+            <div style={{ width: 200, height: 200, background: 'white', padding: 12 }}>
               <div
                 style={{ width: '100%', height: '100%' }}
                 dangerouslySetInnerHTML={{ __html: qrSvg }}

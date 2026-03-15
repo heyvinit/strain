@@ -5,7 +5,7 @@ import QRCode from 'qrcode'
  * qrcode only accepts hex colors, so we generate with white bg
  * then strip the background path to make it transparent.
  */
-export async function qrToSvg(url: string, dotColor = '#555555'): Promise<string> {
+export async function qrToSvg(url: string, dotColor = '#888888'): Promise<string> {
   const svg = await QRCode.toString(url, {
     type: 'svg',
     margin: 0,
