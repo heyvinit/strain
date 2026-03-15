@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
-import QRCode from 'qrcode'
+import { qrToSvg } from '@/lib/qr'
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -144,11 +144,7 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
   const stats = computePassportStats(allRaces)
 
   const profileUrl = `https://getstrain.app/${username}`
-  const qrSvg = await QRCode.toString(profileUrl, {
-    type: 'svg',
-    margin: 0,
-    color: { dark: '#555555', light: 'transparent' },
-  })
+  const qrSvg = await qrToSvg(profileUrl)
 
   return (
     <div

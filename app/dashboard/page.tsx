@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import ShareButton from '@/components/ShareButton'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
 import EmailPrompt from '@/components/EmailPrompt'
-import QRCode from 'qrcode'
+import { qrToSvg } from '@/lib/qr'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -120,11 +120,7 @@ export default async function DashboardPage() {
   const stats = computePassportStats(allRaces)
 
   const profileUrl = `https://getstrain.app/${session!.user.username}`
-  const qrSvg = await QRCode.toString(profileUrl, {
-    type: 'svg',
-    margin: 0,
-    color: { dark: '#555555', light: 'transparent' },
-  })
+  const qrSvg = await qrToSvg(profileUrl)
 
   const isNewUser = allRaces.length === 0
 
