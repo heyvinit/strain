@@ -21,6 +21,7 @@ async function generateUsername(name: string, email: string): Promise<string> {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     Strava({
       clientId: process.env.STRAVA_CLIENT_ID!,
