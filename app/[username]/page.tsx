@@ -147,7 +147,7 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
   const qrSvg = await QRCode.toString(profileUrl, {
     type: 'svg',
     margin: 0,
-    color: { dark: '#000000', light: '#ffffff' },
+    color: { dark: '#555555', light: 'transparent' },
   })
 
   return (

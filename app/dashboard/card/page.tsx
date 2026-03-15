@@ -76,9 +76,31 @@ function RacePicker() {
           <Loader2 size={28} className="animate-spin" style={{ color: '#FC4C02' }} />
         </div>
       ) : races.length === 0 ? (
-        <div className="rounded-2xl p-5 text-center" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
-          <p className="text-sm font-semibold mb-1" style={{ color: '#111' }}>No completed races yet</p>
-          <p className="text-xs" style={{ color: '#aaa' }}>Add a race result first, then come back to make a stat card.</p>
+        <div className="flex flex-col gap-3">
+          <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
+            <p className="text-sm font-semibold mb-1" style={{ color: '#111' }}>No completed races yet</p>
+            <p className="text-xs mb-4" style={{ color: '#aaa' }}>
+              Add a race result to get started — paste a result link or enter your data manually.
+            </p>
+            <a
+              href="/dashboard/add"
+              className="block text-center py-3 rounded-2xl text-sm font-semibold text-white"
+              style={{ background: '#111' }}
+            >
+              Add a race →
+            </a>
+          </div>
+
+          <div className="rounded-2xl px-4 py-3 flex items-center justify-center gap-2" style={{ background: '#F8F8F7', border: '1px dashed #E0E0DE' }}>
+            <span className="text-xs" style={{ color: '#bbb' }}>Already added one?</span>
+            <button
+              onClick={() => { setLoading(true); fetch('/api/races').then(r => r.json()).then(json => { if (json.success) setRaces(json.races) }).finally(() => setLoading(false)) }}
+              className="text-xs font-semibold"
+              style={{ color: '#FC4C02' }}
+            >
+              Refresh
+            </button>
+          </div>
         </div>
       ) : (
         <div className="flex flex-col gap-2">

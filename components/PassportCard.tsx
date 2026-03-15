@@ -1,4 +1,5 @@
 import type { DbUser, DbUserRace } from '@/lib/supabase'
+import QrButton from './QrButton'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -230,11 +231,7 @@ export default function PassportCard({
             </p>
           </div>
           {qrSvg ? (
-            <div
-              className="rounded-lg overflow-hidden shrink-0"
-              style={{ width: 36, height: 36, background: 'white', padding: 3 }}
-              dangerouslySetInnerHTML={{ __html: qrSvg }}
-            />
+            <QrButton qrSvg={qrSvg} />
           ) : (
             <img src="/strain-logo.svg" alt="Strain" className="h-5 w-auto opacity-20" style={{ filter: 'invert(1)' }} />
           )}
