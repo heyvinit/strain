@@ -756,7 +756,7 @@ export default function AddRacePage() {
                 <div className="flex flex-col gap-3 items-center py-16">
                   <p className="text-sm" style={{ color: '#888' }}>No races found on Strava.</p>
                   <p className="text-xs text-center px-4" style={{ color: '#bbb' }}>
-                    Strava only marks activities as races when you set the workout type to "Race" in the app.
+                    Strava only marks activities as races when you set the workout type to &quot;Race&quot; in the app.
                   </p>
                   <button onClick={() => setPastMethod(null)} className="text-sm font-medium" style={{ color: '#FC4C02' }}>
                     Go back

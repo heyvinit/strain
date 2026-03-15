@@ -153,7 +153,7 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
     return (
       <div className="rounded-3xl p-4 flex flex-col gap-3" style={{ background: 'white', border: '1px solid #FFE0D6' }}>
         <p className="text-sm font-semibold" style={{ color: '#111' }}>Remove this race?</p>
-        <p className="text-xs" style={{ color: '#888' }}>This can't be undone.</p>
+        <p className="text-xs" style={{ color: '#888' }}>This can&apos;t be undone.</p>
         <div className="flex gap-2">
           <button
             onClick={handleDelete}

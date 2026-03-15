@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import ShareButton from '@/components/ShareButton'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
 import EmailPrompt from '@/components/EmailPrompt'
+import QRCode from 'qrcode'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -118,6 +119,15 @@ export default async function DashboardPage() {
   const past = allRaces.filter(r => r.status === 'completed')
   const stats = computePassportStats(allRaces)
 
+  const profileUrl = `https://getstrain.app/${session!.user.username}`
+  const qrSvg = await QRCode.toString(profileUrl, {
+    type: 'svg',
+    margin: 0,
+    color: { dark: '#000000', light: '#ffffff' },
+  })
+
+  const isNewUser = allRaces.length === 0
+
   return (
     <div className="px-5 pt-14 pb-10 lg:px-12 lg:pt-12">
       <div className="lg:flex lg:gap-10 lg:items-start">
@@ -144,12 +154,53 @@ export default async function DashboardPage() {
               stats={stats}
               username={session!.user.username}
               isOwner
+              qrSvg={qrSvg}
             />
           )}
         </div>
 
         {/* ── Right col: upcoming + race history ── */}
         <div className="lg:flex-1 lg:min-w-0">
+
+          {/* Onboarding — shown only when user has no races yet */}
+          {isNewUser && (
+            <div className="rounded-3xl p-5 mb-5" style={{ background: 'linear-gradient(135deg, #FC4C02 0%, #ff7043 100%)' }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                Welcome to Strain
+              </p>
+              <p className="text-xl font-bold text-white leading-snug mb-3">
+                Build your athlete passport
+              </p>
+              <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                Add your race results and Strain automatically tracks your PBs, builds your passport, and creates shareable stat cards.
+              </p>
+              <div className="flex flex-col gap-2">
+                {[
+                  { step: '1', text: 'Paste a race result link or enter manually' },
+                  { step: '2', text: 'Your passport updates with PBs & stats' },
+                  { step: '3', text: 'Share your passport or create a stat card' },
+                ].map(({ step, text }) => (
+                  <div key={step} className="flex items-center gap-3">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                      style={{ background: 'rgba(255,255,255,0.25)', color: 'white' }}
+                    >
+                      {step}
+                    </div>
+                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>{text}</p>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/dashboard/add"
+                className="mt-4 block text-center py-3 rounded-2xl text-sm font-bold"
+                style={{ background: 'white', color: '#FC4C02' }}
+              >
+                Add your first race →
+              </Link>
+            </div>
+          )}
+
           {/* Upcoming */}
           {upcoming.length > 0 && (
             <section className="mb-5">
@@ -161,32 +212,34 @@ export default async function DashboardPage() {
           )}
 
           {/* Race history */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>Race History</h2>
-              {past.length > 0 && (
-                <Link href="/dashboard/add" className="text-xs font-semibold" style={{ color: '#FC4C02' }}>+ Add race</Link>
-              )}
-            </div>
-
-            {past.length > 0 ? (
-              <div className="flex flex-col gap-2">
-                {past.map(race => <RaceRow key={race.id} race={race} />)}
+          {!isNewUser && (
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>Race History</h2>
+                {past.length > 0 && (
+                  <Link href="/dashboard/add" className="text-xs font-semibold" style={{ color: '#FC4C02' }}>+ Add race</Link>
+                )}
               </div>
-            ) : (
-              <Link href="/dashboard/add" className="block active:scale-[0.98] transition-transform duration-75">
-                <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'white', border: '1px dashed #E0E0E0' }}>
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FFF5F2' }}>
-                    <span style={{ color: '#FC4C02', fontSize: 18, fontWeight: 700 }}>+</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: '#111' }}>Add your first race</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#aaa' }}>Paste a result link to get started</p>
-                  </div>
+
+              {past.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {past.map(race => <RaceRow key={race.id} race={race} />)}
                 </div>
-              </Link>
-            )}
-          </section>
+              ) : (
+                <Link href="/dashboard/add" className="block active:scale-[0.98] transition-transform duration-75">
+                  <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'white', border: '1px dashed #E0E0E0' }}>
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: '#FFF5F2' }}>
+                      <span style={{ color: '#FC4C02', fontSize: 18, fontWeight: 700 }}>+</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: '#111' }}>Add your first race</p>
+                      <p className="text-xs mt-0.5" style={{ color: '#aaa' }}>Paste a result link to get started</p>
+                    </div>
+                  </div>
+                </Link>
+              )}
+            </section>
+          )}
         </div>
 
       </div>

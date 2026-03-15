@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Download, Loader2 } from 'lucide-react'
+import { ArrowLeft, Download, Loader2, ChevronRight } from 'lucide-react'
 import RaceCard from '@/components/RaceCard'
 import Controls from '@/components/Controls'
 import type { RaceData, CardStyle } from '@/lib/types'
@@ -23,6 +23,94 @@ const DEFAULT_STYLE: CardStyle = {
   cardBg: 'transparent',
 }
 
+interface RaceSummary {
+  id: string
+  race_name: string
+  race_date: string | null
+  distance: string
+  sport: string | null
+  net_time: string | null
+}
+
+function formatDate(d: string | null): { month: string; day: string } {
+  if (!d) return { month: '—', day: '—' }
+  const date = new Date(d + 'T00:00:00')
+  return {
+    month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+    day: String(date.getDate()),
+  }
+}
+
+function formatTime(t: string | null): string {
+  if (!t) return '—'
+  return t.replace(/^0(\d):/, '$1:')
+}
+
+function RacePicker() {
+  const router = useRouter()
+  const [races, setRaces] = useState<RaceSummary[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/races')
+      .then(r => r.json())
+      .then(json => { if (json.success) setRaces(json.races) })
+      .finally(() => setLoading(false))
+  }, [])
+
+  return (
+    <div className="px-5 pt-14 pb-6">
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={() => router.back()}
+          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+          style={{ background: 'white', border: '1px solid #F0F0EE' }}
+        >
+          <ArrowLeft size={16} color="#111" />
+        </button>
+        <h1 className="text-lg font-bold" style={{ color: '#111' }}>Choose a race</h1>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-24">
+          <Loader2 size={28} className="animate-spin" style={{ color: '#FC4C02' }} />
+        </div>
+      ) : races.length === 0 ? (
+        <div className="rounded-2xl p-5 text-center" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
+          <p className="text-sm font-semibold mb-1" style={{ color: '#111' }}>No completed races yet</p>
+          <p className="text-xs" style={{ color: '#aaa' }}>Add a race result first, then come back to make a stat card.</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {races.map(race => {
+            const { month, day } = formatDate(race.race_date)
+            return (
+              <button
+                key={race.id}
+                onClick={() => router.push(`/dashboard/card?raceId=${race.id}`)}
+                className="w-full flex items-center gap-4 bg-white rounded-2xl px-4 py-3.5 active:scale-[0.98] transition-transform duration-75 text-left"
+                style={{ border: '1px solid #F0F0EE' }}
+              >
+                <div className="flex flex-col items-center w-9 shrink-0">
+                  <span className="text-[10px] font-semibold" style={{ color: '#aaa' }}>{month}</span>
+                  <span className="text-xl font-bold leading-tight" style={{ color: '#111' }}>{day}</span>
+                </div>
+                <div className="w-px self-stretch" style={{ background: '#F0F0EE' }} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate" style={{ color: '#111' }}>{race.race_name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#888' }}>{race.distance}</p>
+                </div>
+                <span className="text-sm font-bold shrink-0" style={{ color: '#111' }}>{formatTime(race.net_time)}</span>
+                <ChevronRight size={14} color="#ccc" />
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function CardPageInner() {
   const params = useSearchParams()
   const router = useRouter()
@@ -36,7 +124,7 @@ function CardPageInner() {
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!raceId) { setError('No race selected.'); setLoading(false); return }
+    if (!raceId) { setLoading(false); return }
 
     fetch(`/api/races/${raceId}`)
       .then(r => r.json())
@@ -77,6 +165,11 @@ function CardPageInner() {
     cardStyle.cardBg === 'transparent' ? 'Transparent PNG'
     : cardStyle.cardBg === 'blur' ? 'Blur background'
     : 'Glass background'
+
+  // No raceId — show race picker (after all hooks)
+  if (!raceId && !loading) {
+    return <RacePicker />
+  }
 
   return (
     <div className="px-5 pt-14 pb-6">

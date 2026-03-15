@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth, signIn } from '@/auth'
 import MockPassport from '@/components/MockPassport'
 
@@ -62,16 +63,16 @@ export default async function LandingPage() {
       {/* Already have account */}
       <p className="relative z-10 mt-5 text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
         Already have an account?{' '}
-        <a href="/login" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Link href="/login" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Sign in
-        </a>
+        </Link>
       </p>
 
       {/* Legal links */}
       <div className="relative z-10 mt-3 flex items-center gap-3" style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>
-        <a href="/privacy" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy Policy</a>
+        <Link href="/privacy" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy Policy</Link>
         <span>·</span>
-        <a href="/terms" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms of Service</a>
+        <Link href="/terms" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms of Service</Link>
       </div>
     </main>
   )

@@ -2,16 +2,17 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Plus, User } from 'lucide-react'
+import { Home, Plus, User, Sparkles } from 'lucide-react'
 
 interface BottomNavProps {
   username: string
 }
 
 const NAV = [
-  { href: '/dashboard',         icon: Home,  label: 'Home'    },
-  { href: '/dashboard/add',     icon: Plus,  label: 'Add'     },
-  { href: '/dashboard/profile', icon: User,  label: 'Profile' },
+  { href: '/dashboard',         icon: Home,     label: 'Home'    },
+  { href: '/dashboard/add',     icon: Plus,     label: 'Add'     },
+  { href: '/dashboard/card',    icon: Sparkles, label: 'Card'    },
+  { href: '/dashboard/profile', icon: User,     label: 'Profile' },
 ]
 
 export default function BottomNav({ username }: BottomNavProps) {
@@ -28,6 +29,7 @@ export default function BottomNav({ username }: BottomNavProps) {
           const isActive =
             (label === 'Home' && (pathname === '/dashboard' || pathname.startsWith('/dashboard/races'))) ||
             (label === 'Add' && pathname === '/dashboard/add') ||
+            (label === 'Card' && pathname.startsWith('/dashboard/card')) ||
             (label === 'Profile' && pathname.startsWith('/dashboard/profile'))
 
           return (

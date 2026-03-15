@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { Pencil, Camera, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { logout } from '@/app/actions'
 
 interface Props {
@@ -258,13 +259,13 @@ export default function ProfileSettings({ name, username, avatarUrl, email, emai
 
       {/* Blog link */}
       <div className="text-center pb-2">
-        <a
+        <Link
           href="/blog"
           className="text-xs"
           style={{ color: '#bbb' }}
         >
           Race tips &amp; guides →
-        </a>
+        </Link>
       </div>
 
     </div>
