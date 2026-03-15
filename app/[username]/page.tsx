@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
+import QRCode from 'qrcode'
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -142,6 +143,13 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
   const past = allRaces.filter(r => r.status === 'completed')
   const stats = computePassportStats(allRaces)
 
+  const profileUrl = `https://getstrain.app/${username}`
+  const qrSvg = await QRCode.toString(profileUrl, {
+    type: 'svg',
+    margin: 0,
+    color: { dark: '#000000', light: '#ffffff' },
+  })
+
   return (
     <div
       className="min-h-screen relative"
@@ -162,7 +170,7 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
 
             {/* ── Passport card ── */}
             <div className="lg:w-[360px] lg:shrink-0 lg:sticky lg:top-10 mb-6 lg:mb-0">
-              <PassportCard user={user} stats={stats} username={username} />
+              <PassportCard user={user} stats={stats} username={username} qrSvg={qrSvg} />
             </div>
 
             {/* ── Race list + CTA ── */}

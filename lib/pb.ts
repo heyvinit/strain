@@ -17,7 +17,7 @@ function timeToSecs(t: string | null): number {
   return Infinity
 }
 
-/** Recalculates is_pb for all completed running races for a user. */
+/** Recalculates is_pb for all completed running + Hyrox races for a user. */
 export async function recalcPBs(userId: string): Promise<void> {
   const { data: races } = await supabaseAdmin
     .from('user_races')
@@ -27,10 +27,10 @@ export async function recalcPBs(userId: string): Promise<void> {
 
   if (!races?.length) return
 
-  // PBs only meaningful for running races
   const runningRaces = races.filter(r => !r.sport || r.sport === 'running')
+  const hyroxRaces = races.filter(r => r.sport === 'hyrox')
 
-  // Find fastest per category
+  // Find fastest per category for running
   const best: Record<string, number> = {}
   const bestId: Record<string, string> = {}
 
@@ -44,15 +44,28 @@ export async function recalcPBs(userId: string): Promise<void> {
     }
   }
 
-  const pbIds = new Set(Object.values(bestId))
+  // Find fastest Hyrox time (single category)
+  let bestHyroxSecs = Infinity
+  let bestHyroxId: string | null = null
+  for (const r of hyroxRaces) {
+    if (!r.net_time) continue
+    const secs = timeToSecs(r.net_time)
+    if (secs < bestHyroxSecs) {
+      bestHyroxSecs = secs
+      bestHyroxId = r.id
+    }
+  }
 
-  // Reset is_pb on all running races, then flip winners
-  const runningIds = runningRaces.map(r => r.id)
-  if (runningIds.length > 0) {
+  const pbIds = new Set(Object.values(bestId))
+  if (bestHyroxId) pbIds.add(bestHyroxId)
+
+  // Reset is_pb on all running + hyrox races, then flip winners
+  const trackedIds = [...runningRaces, ...hyroxRaces].map(r => r.id)
+  if (trackedIds.length > 0) {
     await supabaseAdmin
       .from('user_races')
       .update({ is_pb: false })
-      .in('id', runningIds)
+      .in('id', trackedIds)
   }
 
   if (pbIds.size > 0) {

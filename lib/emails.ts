@@ -1,8 +1,13 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = 'hello@getstrain.app'
 const BASE_URL = 'https://getstrain.app'
+
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
+  return new Resend(apiKey)
+}
 
 // ─── Shared styles ─────────────────────────────────────────────────────────────
 
@@ -52,6 +57,7 @@ export async function sendPreRaceEmail({
   sport: string
   raceId: string
 }) {
+  const resend = getResendClient()
   const firstName = name.split(' ')[0]
   const formattedDate = new Date(raceDate + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric',
@@ -98,7 +104,7 @@ export async function sendPostRaceEmail({
   distance: string
   sport: string
 }) {
-  const firstName = name.split(' ')[0]
+  const resend = getResendClient()
   const formattedDate = new Date(raceDate + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric',
   })

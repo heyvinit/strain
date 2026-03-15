@@ -3,6 +3,7 @@
 import { signIn } from '@/auth'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function LoginPage() {
   const session = await auth()
@@ -74,9 +75,9 @@ export default async function LoginPage() {
 
         <p className="text-xs mt-6 text-center" style={{ color: '#bbb' }}>
           By signing in you agree to our{' '}
-          <a href="/terms" className="underline underline-offset-2">terms</a>
+          <Link href="/terms" className="underline underline-offset-2">terms</Link>
           {' '}and{' '}
-          <a href="/privacy" className="underline underline-offset-2">privacy policy</a>.
+          <Link href="/privacy" className="underline underline-offset-2">privacy policy</Link>.
         </p>
       </div>
     </main>

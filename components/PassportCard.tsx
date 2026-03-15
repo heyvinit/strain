@@ -91,7 +91,7 @@ export interface PassportStats {
   completed: number
   upcoming: number
   countries: string[]   // unique country names with flag
-  pbs: { fm?: string; hm?: string; '10k'?: string; '5k'?: string }
+  pbs: { fm?: string; hm?: string; hyrox?: string; '10k'?: string; '5k'?: string }
 }
 
 function distanceCategory(d: string): string {
@@ -115,6 +115,7 @@ export function computePassportStats(races: DbUserRace[]): PassportStats {
   const completed = races.filter(r => r.status === 'completed')
   const upcoming = races.filter(r => r.status === 'upcoming')
   const running = completed.filter(r => !r.sport || r.sport === 'running')
+  const hyrox = completed.filter(r => r.sport === 'hyrox')
 
   // Unique countries (from all races)
   const countrySet = new Set<string>()
@@ -122,7 +123,7 @@ export function computePassportStats(races: DbUserRace[]): PassportStats {
     if (r.country?.trim()) countrySet.add(r.country.trim())
   }
 
-  // PBs for running only
+  // PBs for running
   const best: Record<string, number> = {}
   const bestTime: Record<string, string> = {}
   for (const r of running) {
@@ -135,6 +136,18 @@ export function computePassportStats(races: DbUserRace[]): PassportStats {
     }
   }
 
+  // PB for Hyrox (single category)
+  let bestHyroxSecs = Infinity
+  let bestHyroxTime: string | undefined
+  for (const r of hyrox) {
+    if (!r.net_time) continue
+    const secs = timeToSecs(r.net_time)
+    if (secs < bestHyroxSecs) {
+      bestHyroxSecs = secs
+      bestHyroxTime = r.net_time
+    }
+  }
+
   return {
     completed: completed.length,
     upcoming: upcoming.length,
@@ -142,6 +155,7 @@ export function computePassportStats(races: DbUserRace[]): PassportStats {
     pbs: {
       fm: bestTime['fm'],
       hm: bestTime['hm'],
+      hyrox: bestHyroxTime,
       '10k': bestTime['10k'],
       '5k': bestTime['5k'],
     },
@@ -155,16 +169,18 @@ export default function PassportCard({
   stats,
   username,
   isOwner = false,
+  qrSvg,
 }: {
   user: DbUser
   stats: PassportStats
   username: string
   isOwner?: boolean
+  qrSvg?: string
 }) {
   const PB_SLOTS = [
     { label: 'Marathon',      value: stats.pbs.fm },
     { label: 'Half Marathon', value: stats.pbs.hm },
-    { label: 'Hyrox',         value: undefined },
+    { label: 'Hyrox',         value: stats.pbs.hyrox },
     { label: '10K',           value: stats.pbs['10k'] },
     { label: '5K',            value: stats.pbs['5k'] },
   ]
@@ -213,7 +229,15 @@ export default function PassportCard({
               STRAIN · GETSTRAIN.APP
             </p>
           </div>
-          <img src="/strain-logo.svg" alt="Strain" className="h-5 w-auto opacity-20" style={{ filter: 'invert(1)' }} />
+          {qrSvg ? (
+            <div
+              className="rounded-lg overflow-hidden shrink-0"
+              style={{ width: 36, height: 36, background: 'white', padding: 3 }}
+              dangerouslySetInnerHTML={{ __html: qrSvg }}
+            />
+          ) : (
+            <img src="/strain-logo.svg" alt="Strain" className="h-5 w-auto opacity-20" style={{ filter: 'invert(1)' }} />
+          )}
         </div>
 
         {/* Identity */}
