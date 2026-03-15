@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import ShareButton from '@/components/ShareButton'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
 import EmailPrompt from '@/components/EmailPrompt'
+import PassportDownload from '@/components/PassportDownload'
 import { qrToSvg } from '@/lib/qr'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -145,13 +146,18 @@ export default async function DashboardPage() {
           )}
 
           {user && (
-            <PassportCard
-              user={user}
-              stats={stats}
-              username={session!.user.username}
-              isOwner
-              qrSvg={qrSvg}
-            />
+            <>
+              <PassportCard
+                user={user}
+                stats={stats}
+                username={session!.user.username}
+                isOwner
+                qrSvg={qrSvg}
+              />
+              <div className="flex justify-end -mt-4 mb-6">
+                <PassportDownload />
+              </div>
+            </>
           )}
         </div>
 

@@ -65,13 +65,15 @@ type Platform =
   | 'ifinish'
   | 'sportstiming'
   | 'nyrr'
+  | 'runsignup'
+  | 'chronotrack'
   | 'generic'
 
 // Platforms whose static HTML already has all data (Axios is fine, fast)
 const STATIC_PLATFORMS: Platform[] = ['webscorer', 'athlinks']
 
 // Platforms that are definitely JS-rendered SPAs — always use Puppeteer
-const JS_PLATFORMS: Platform[] = ['ifinish', 'raceresult']
+const JS_PLATFORMS: Platform[] = ['ifinish', 'raceresult', 'runsignup', 'chronotrack']
 
 // Platforms handled via direct API calls (no HTML fetching needed)
 const API_PLATFORMS: Platform[] = ['nyrr', 'sportstiming']
@@ -83,6 +85,8 @@ function detectPlatform(hostname: string): Platform {
   if (hostname.includes('ifinish.in')) return 'ifinish'
   if (hostname.includes('sportstimingsolutions.in')) return 'sportstiming'
   if (hostname.includes('nyrr.org')) return 'nyrr'
+  if (hostname.includes('runsignup.com')) return 'runsignup'
+  if (hostname.includes('chronotrack.com') || hostname.includes('haku.co')) return 'chronotrack'
   return 'generic'
 }
 
@@ -254,7 +258,7 @@ export async function scrapeRaceResult(url: string): Promise<ScrapeResult> {
     case 'raceresult':  result = parseRaceResult($, normalizedUrl); break
     case 'athlinks':    result = parseAthlinks($, normalizedUrl); break
     case 'ifinish':     result = parseIfinish($, normalizedUrl); break
-    default:            result = await parseGeneric($, normalizedUrl, html)
+    default:            result = await parseGeneric($, normalizedUrl, html); break
   }
 
   if (!result.success && result.isLeaderboardPage) {

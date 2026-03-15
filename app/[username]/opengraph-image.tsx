@@ -34,6 +34,7 @@ export default async function Image({ params }: { params: Promise<{ username: st
   const pbRows = [
     { label: 'Marathon', value: stats.pbs.fm },
     { label: 'Half Marathon', value: stats.pbs.hm },
+    { label: 'Hyrox', value: stats.pbs.hyrox },
     { label: '10K', value: stats.pbs['10k'] },
     { label: '5K', value: stats.pbs['5k'] },
   ].filter(pb => pb.value)
