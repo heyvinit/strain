@@ -16,21 +16,25 @@ body {
   box-sizing: border-box;
 }
 
-/* ── Tap / click feedback for all interactive elements ── */
+/* ── Tap / click feedback ── */
 button, a, [role="button"] {
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.12s ease, transform 0.12s ease;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-button:active, a:active, [role="button"]:active {
-  opacity: 0.75;
-  transform: scale(0.97);
+/* data-pressing is set by TapFeedback.tsx via touchstart/touchend,
+   which is reliable on iOS Safari unlike CSS :active */
+button[data-pressing],
+a[data-pressing],
+[role="button"][data-pressing] {
+  opacity: 0.65;
+  transform: scale(0.95);
 }
 
-/* Don't shrink elements that already handle their own active scale */
-.no-shrink:active {
+/* Elements that handle their own press scale (e.g. race cards) */
+.no-shrink[data-pressing] {
+  opacity: 0.85;
   transform: none;
-  opacity: 1;
 }
 
 @keyframes fade-in {

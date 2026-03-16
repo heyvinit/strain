@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk, Space_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import TapFeedback from '@/components/TapFeedback'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')` }} />
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} ${spaceMono.variable} antialiased`}>
+        <TapFeedback />
         {children}
         <Analytics />
       </body>
