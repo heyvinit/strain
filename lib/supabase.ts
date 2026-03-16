@@ -31,6 +31,16 @@ export interface DbUser {
 
 export type SportType = 'running' | 'hyrox' | 'triathlon' | 'ocr' | 'cycling' | 'other'
 
+export interface DbRacePhoto {
+  id: string
+  race_id: string
+  user_id: string
+  photo_url: string
+  is_thumbnail: boolean
+  sort_order: number
+  created_at: string
+}
+
 export interface DbUserRace {
   id: string
   user_id: string

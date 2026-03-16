@@ -1,6 +1,20 @@
 import type { DbUserRace } from '@/lib/supabase'
 import Link from 'next/link'
 
+// ─── Image transform helper ───────────────────────────────────────────────────
+
+/** Use Supabase image transform API to serve a resized thumbnail — much faster */
+function cardThumbSrc(url: string): string {
+  const base = url.split('?')[0]
+  if (base.includes('/storage/v1/object/public/')) {
+    return (
+      base.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
+      '?width=400&resize=cover&quality=80'
+    )
+  }
+  return url
+}
+
 // ─── Category gradients ────────────────────────────────────────────────────────
 
 const SPORT_GRADIENTS: Record<string, string> = {
@@ -55,7 +69,7 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
       {race.photo_url && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={race.photo_url}
+          src={cardThumbSrc(race.photo_url)}
           alt=""
           style={{
             position: 'absolute',
@@ -64,6 +78,7 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
             height: '100%',
             objectFit: 'cover',
           }}
+          loading="lazy"
         />
       )}
 

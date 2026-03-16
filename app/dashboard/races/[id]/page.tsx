@@ -5,7 +5,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Sparkles } from 'lucide-react'
 import RaceActions from '@/components/RaceActions'
-import RacePhotoUpload from '@/components/RacePhotoUpload'
+import RacePhotoGallery from '@/components/RacePhotoGallery'
+import type { DbRacePhoto } from '@/lib/supabase'
 
 function formatTime(t: string | null): string {
   if (!t) return '—'
@@ -39,6 +40,15 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
     .single<DbUserRace>()
 
   if (!race) notFound()
+
+  const { data: photos } = await supabaseAdmin
+    .from('race_photos')
+    .select('*')
+    .eq('race_id', id)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+
+  const racePhotos: DbRacePhoto[] = photos ?? []
 
   const isOwner = session?.user.userId === race.user_id
 
@@ -137,7 +147,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
       {/* Owner actions */}
       {isOwner && (
         <div className="flex flex-col gap-2">
-          <RacePhotoUpload raceId={race.id} currentPhotoUrl={race.photo_url ?? null} />
+          <RacePhotoGallery raceId={race.id} initialPhotos={racePhotos} />
           {/* Stat card — only for completed races with a time */}
           {race.status === 'completed' && race.net_time && (
             <Link
