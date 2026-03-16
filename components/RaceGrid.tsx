@@ -157,6 +157,39 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
         )}
       </div>
 
+      {/* No-photo nudge for past races */}
+      {!race.photo_url && !isUpcoming && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: 0,
+            right: 0,
+            transform: 'translateY(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+            padding: '0 12px',
+            pointerEvents: 'none',
+          }}
+        >
+          <span style={{ fontSize: 18, opacity: 0.15 }}>📷</span>
+          <span
+            style={{
+              color: 'rgba(255,255,255,0.2)',
+              fontSize: 9,
+              fontWeight: 600,
+              textAlign: 'center',
+              lineHeight: 1.4,
+              letterSpacing: '0.03em',
+            }}
+          >
+            Add your race day photos
+          </span>
+        </div>
+      )}
+
       {/* Bottom content */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 12px 13px' }}>
         <p

@@ -258,7 +258,7 @@ export default function AddRacePage() {
       })
       if (!json.success) { setUpcomingError(json.error ?? 'Failed to save.'); setUpcomingSaving(false); return }
       setDone(true)
-      setTimeout(() => router.push('/dashboard'), 1500)
+      setTimeout(() => router.push(`/dashboard/races/${json.race.id}`), 1500)
     } catch {
       setUpcomingError('Something went wrong.')
       setUpcomingSaving(false)
@@ -295,7 +295,7 @@ export default function AddRacePage() {
       const json = await saveToPassport({ ...preview, result_url: url })
       if (!json.success) { setUrlError(json.error ?? 'Failed to save.'); setUrlStep('error'); return }
       setDone(true)
-      setTimeout(() => router.push('/dashboard'), 1500)
+      setTimeout(() => router.push(`/dashboard/races/${json.race.id}`), 1500)
     } catch {
       setUrlError('Failed to save.')
       setUrlStep('error')
@@ -379,7 +379,7 @@ export default function AddRacePage() {
       })
       if (!json.success) { setManualError(json.error ?? 'Failed to save.'); setManualSaving(false); return }
       setDone(true)
-      setTimeout(() => router.push('/dashboard'), 1500)
+      setTimeout(() => router.push(`/dashboard/races/${json.race.id}`), 1500)
     } catch {
       setManualError('Something went wrong.')
       setManualSaving(false)
