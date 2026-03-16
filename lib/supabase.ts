@@ -48,6 +48,7 @@ export interface DbUserRace {
   overall_position: string | null
   category_position: string | null
   category: string | null
+  photo_url: string | null
   result_url: string | null
   timing_platform: string | null
   strava_activity_id: number | null

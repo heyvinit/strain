@@ -51,22 +51,40 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
         background: gradient,
       }}
     >
-      {/* Sport icon watermark */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 64,
-          opacity: 0.1,
-          userSelect: 'none',
-          pointerEvents: 'none',
-        }}
-      >
-        {icon}
-      </div>
+      {/* Race photo — shown when user has uploaded one */}
+      {race.photo_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={race.photo_url}
+          alt=""
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      )}
+
+      {/* Sport icon watermark — only shown when no photo */}
+      {!race.photo_url && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 64,
+            opacity: 0.1,
+            userSelect: 'none',
+            pointerEvents: 'none',
+          }}
+        >
+          {icon}
+        </div>
+      )}
 
       {/* Upcoming tint overlay */}
       {isUpcoming && (

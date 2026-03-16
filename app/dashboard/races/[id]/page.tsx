@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Sparkles } from 'lucide-react'
 import RaceActions from '@/components/RaceActions'
+import RacePhotoUpload from '@/components/RacePhotoUpload'
 
 function formatTime(t: string | null): string {
   if (!t) return '—'
@@ -136,6 +137,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
       {/* Owner actions */}
       {isOwner && (
         <div className="flex flex-col gap-2">
+          <RacePhotoUpload raceId={race.id} currentPhotoUrl={race.photo_url ?? null} />
           {/* Stat card — only for completed races with a time */}
           {race.status === 'completed' && race.net_time && (
             <Link
