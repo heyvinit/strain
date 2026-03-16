@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
 import RaceGrid from '@/components/RaceGrid'
+import FloatingShare from '@/components/FloatingShare'
 import { qrToSvg } from '@/lib/qr'
 
 // ─── Metadata ──────────────────────────────────────────────────────────────────
@@ -66,6 +67,8 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
     >
       {/* Overlay */}
       <div className="fixed inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.55)' }} />
+
+      <FloatingShare username={username} />
 
       {/* Content */}
       <div className="relative z-10 px-5 pt-10 pb-16 flex flex-col items-center lg:pt-14">
