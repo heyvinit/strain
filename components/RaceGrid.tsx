@@ -1,3 +1,7 @@
+'use client'
+
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import type { DbUserRace } from '@/lib/supabase'
 import Link from 'next/link'
 
@@ -207,6 +211,114 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
   return inner
 }
 
+// ─── Collapsible upcoming list ────────────────────────────────────────────────
+
+function UpcomingSection({
+  upcoming,
+  dashboardLinks,
+  labelColor,
+  sectionLabel,
+}: {
+  upcoming: DbUserRace[]
+  dashboardLinks: boolean
+  labelColor?: string
+  sectionLabel: React.CSSProperties
+}) {
+  const [open, setOpen] = useState(true)
+
+  return (
+    <section>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          marginBottom: open ? 12 : 0,
+        }}
+      >
+        <span style={sectionLabel}>Upcoming ({upcoming.length})</span>
+        <ChevronDown
+          size={13}
+          color={labelColor ?? 'rgba(255,255,255,0.5)'}
+          style={{
+            transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
+            transition: 'transform 0.2s',
+            marginTop: -12,
+          }}
+        />
+      </button>
+
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {upcoming.map(r => {
+            const href = dashboardLinks ? `/dashboard/races/${r.id}` : undefined
+            const row = (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 14px',
+                  borderRadius: 14,
+                  background: labelColor ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
+                  gap: 10,
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                  <span
+                    style={{
+                      color: labelColor ? '#111' : 'white',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {r.race_name}
+                  </span>
+                  {r.race_date && (
+                    <span style={{ color: labelColor ?? 'rgba(255,255,255,0.45)', fontSize: 11 }}>
+                      {new Date(r.race_date + 'T00:00:00').toLocaleDateString('en-US', {
+                        day: 'numeric', month: 'short', year: 'numeric',
+                      })}
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    background: '#FC4C02',
+                    borderRadius: 20,
+                    padding: '3px 8px',
+                    flexShrink: 0,
+                  }}
+                >
+                  <span style={{ color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.06em' }}>
+                    UPCOMING
+                  </span>
+                </div>
+              </div>
+            )
+            if (href) {
+              return (
+                <a key={r.id} href={href} style={{ textDecoration: 'none' }}>
+                  {row}
+                </a>
+              )
+            }
+            return <div key={r.id}>{row}</div>
+          })}
+        </div>
+      )}
+    </section>
+  )
+}
+
 // ─── Grid ─────────────────────────────────────────────────────────────────────
 
 export default function RaceGrid({
@@ -238,69 +350,12 @@ export default function RaceGrid({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {upcoming.length > 0 && (
-        <section>
-          <p style={sectionLabel}>Upcoming</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {upcoming.map(r => {
-              const href = dashboardLinks ? `/dashboard/races/${r.id}` : undefined
-              const row = (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px 14px',
-                    borderRadius: 14,
-                    background: labelColor ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
-                    gap: 10,
-                  }}
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                    <span
-                      style={{
-                        color: labelColor ? '#111' : 'white',
-                        fontWeight: 700,
-                        fontSize: 13,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {r.race_name}
-                    </span>
-                    {r.race_date && (
-                      <span style={{ color: labelColor ?? 'rgba(255,255,255,0.45)', fontSize: 11 }}>
-                        {new Date(r.race_date + 'T00:00:00').toLocaleDateString('en-US', {
-                          day: 'numeric', month: 'short', year: 'numeric',
-                        })}
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      background: '#FC4C02',
-                      borderRadius: 20,
-                      padding: '3px 8px',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ color: 'white', fontSize: 9, fontWeight: 800, letterSpacing: '0.06em' }}>
-                      UPCOMING
-                    </span>
-                  </div>
-                </div>
-              )
-              if (href) {
-                return (
-                  <a key={r.id} href={href} style={{ textDecoration: 'none' }}>
-                    {row}
-                  </a>
-                )
-              }
-              return <div key={r.id}>{row}</div>
-            })}
-          </div>
-        </section>
+        <UpcomingSection
+          upcoming={upcoming}
+          dashboardLinks={dashboardLinks}
+          labelColor={labelColor}
+          sectionLabel={sectionLabel}
+        />
       )}
 
       {past.length > 0 && (
