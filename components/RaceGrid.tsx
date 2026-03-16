@@ -3,13 +3,14 @@ import Link from 'next/link'
 
 // ─── Image transform helper ───────────────────────────────────────────────────
 
-/** Use Supabase image transform API to serve a resized thumbnail — much faster */
+/** Crop image to exactly the card's 3:4 ratio so nothing looks zoomed.
+ *  Supabase requires both width+height for actual cover-crop behaviour. */
 function cardThumbSrc(url: string): string {
   const base = url.split('?')[0]
   if (base.includes('/storage/v1/object/public/')) {
     return (
       base.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
-      '?width=400&resize=cover&quality=80'
+      '?width=400&height=533&resize=cover&quality=75'
     )
   }
   return url

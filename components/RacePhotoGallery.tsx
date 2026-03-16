@@ -33,13 +33,15 @@ async function compressImage(file: File): Promise<Blob> {
   })
 }
 
-/** Return a fast-loading thumbnail URL via Supabase image transform API */
-function thumbSrc(url: string, width = 400): string {
+/** Return a cropped thumbnail URL via Supabase image transform API.
+ *  Width AND height are required so Supabase actually crops to that exact box.
+ *  Without height it only resizes proportionally → portrait photos look zoomed. */
+function thumbSrc(url: string, width = 300, height = 300): string {
   const base = url.split('?')[0]
   if (base.includes('/storage/v1/object/public/')) {
     return (
       base.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
-      `?width=${width}&resize=cover&quality=80`
+      `?width=${width}&height=${height}&resize=cover&quality=75`
     )
   }
   return url
