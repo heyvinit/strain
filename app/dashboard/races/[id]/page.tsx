@@ -67,7 +67,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
       <div className="flex items-center gap-3 mb-6">
         <Link
           href="/dashboard"
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+          className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
           style={{ background: 'white', border: '1px solid #F0F0EE' }}
         >
           <ArrowLeft size={16} color="#111" />

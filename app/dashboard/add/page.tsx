@@ -405,7 +405,7 @@ export default function AddRacePage() {
       <div className="flex items-center gap-3 mb-6">
         <Link
           href="/dashboard"
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+          className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
           style={{ background: 'white', border: '1px solid #F0F0EE' }}
         >
           <ArrowLeft size={16} color="#111" />
@@ -591,7 +591,7 @@ export default function AddRacePage() {
                     <button
                       type="button"
                       onClick={() => setPastMethod(null)}
-                      className="w-12 flex items-center justify-center rounded-2xl"
+                      className="w-12 min-h-[48px] flex items-center justify-center rounded-2xl"
                       style={{ background: 'white', border: '1px solid #F0F0EE' }}
                     >
                       <ArrowLeft size={15} color="#888" />
@@ -835,7 +835,7 @@ export default function AddRacePage() {
                     <button
                       type="button"
                       onClick={() => setPastMethod(null)}
-                      className="w-12 flex items-center justify-center rounded-2xl"
+                      className="w-12 min-h-[48px] flex items-center justify-center rounded-2xl"
                       style={{ background: 'white', border: '1px solid #F0F0EE' }}
                     >
                       <ArrowLeft size={15} color="#888" />
