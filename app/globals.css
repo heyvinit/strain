@@ -16,6 +16,23 @@ body {
   box-sizing: border-box;
 }
 
+/* ── Tap / click feedback for all interactive elements ── */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+button:active, a:active, [role="button"]:active {
+  opacity: 0.75;
+  transform: scale(0.97);
+}
+
+/* Don't shrink elements that already handle their own active scale */
+.no-shrink:active {
+  transform: none;
+  opacity: 1;
+}
+
 @keyframes fade-in {
   from { opacity: 0; transform: translateX(-50%) translateY(6px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }

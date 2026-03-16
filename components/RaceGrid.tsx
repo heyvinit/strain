@@ -229,14 +229,14 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
 
   if (href) {
     return (
-      <Link href={href} className="block active:scale-[0.97] transition-transform duration-75">
+      <Link href={href} className="no-shrink block active:scale-[0.97] transition-transform duration-75">
         {inner}
       </Link>
     )
   }
   if (race.result_url) {
     return (
-      <a href={race.result_url} target="_blank" rel="noopener noreferrer" className="block active:scale-[0.97] transition-transform duration-75">
+      <a href={race.result_url} target="_blank" rel="noopener noreferrer" className="no-shrink block active:scale-[0.97] transition-transform duration-75">
         {inner}
       </a>
     )
@@ -300,6 +300,7 @@ function UpcomingSection({
                   borderRadius: 14,
                   background: labelColor ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
                   gap: 10,
+                  cursor: href ? 'pointer' : 'default',
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
@@ -339,9 +340,9 @@ function UpcomingSection({
             )
             if (href) {
               return (
-                <a key={r.id} href={href} style={{ textDecoration: 'none' }}>
+                <Link key={r.id} href={href} style={{ textDecoration: 'none' }} className="no-shrink block">
                   {row}
-                </a>
+                </Link>
               )
             }
             return <div key={r.id}>{row}</div>

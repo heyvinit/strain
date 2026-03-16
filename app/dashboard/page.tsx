@@ -5,7 +5,6 @@ import Link from 'next/link'
 import ShareButton from '@/components/ShareButton'
 import PassportCard, { computePassportStats } from '@/components/PassportCard'
 import EmailPrompt from '@/components/EmailPrompt'
-import PassportDownload from '@/components/PassportDownload'
 import RaceGrid from '@/components/RaceGrid'
 import { qrToSvg } from '@/lib/qr'
 
@@ -57,9 +56,6 @@ export default async function DashboardPage() {
                 isOwner
                 qrSvg={qrSvg}
               />
-              <div className="flex justify-end -mt-4 mb-6">
-                <PassportDownload />
-              </div>
             </>
           )}
         </div>
