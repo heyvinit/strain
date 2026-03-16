@@ -9,10 +9,6 @@ import PassportDownload from '@/components/PassportDownload'
 import RaceGrid from '@/components/RaceGrid'
 import { qrToSvg } from '@/lib/qr'
 
-function firstName(name: string | null | undefined): string {
-  if (!name) return 'Athlete'
-  return name.split(' ')[0]
-}
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -43,12 +39,8 @@ export default async function DashboardPage() {
         {/* ── Left col: header + passport (sticky on desktop) ── */}
         <div className="lg:w-[360px] lg:shrink-0 lg:sticky lg:top-10">
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="text-sm" style={{ color: '#888' }}>Hello,</p>
-              <h1 className="text-3xl font-bold leading-tight" style={{ color: '#111' }}>
-                {firstName(user?.name)}
-              </h1>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/strain-logo.svg" alt="Strain" style={{ height: 22, width: 'auto' }} />
             <ShareButton username={session!.user.username} />
           </div>
 
