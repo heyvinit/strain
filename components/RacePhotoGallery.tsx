@@ -52,9 +52,11 @@ function thumbSrc(url: string, width = 300, height = 300): string {
 export default function RacePhotoGallery({
   raceId,
   initialPhotos,
+  readOnly = false,
 }: {
   raceId: string
   initialPhotos: DbRacePhoto[]
+  readOnly?: boolean
 }) {
   const [photos, setPhotos] = useState<DbRacePhoto[]>(initialPhotos)
   const [uploading, setUploading] = useState(false)
@@ -185,7 +187,7 @@ export default function RacePhotoGallery({
         ))}
 
         {/* Add more cell */}
-        {photos.length < MAX && (
+        {!readOnly && photos.length < MAX && (
           <button
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
@@ -329,33 +331,37 @@ export default function RacePhotoGallery({
             </div>
           )}
 
-          {/* Bottom actions */}
-          <div style={{ padding: '12px 20px 32px', display: 'flex', gap: 10, flexShrink: 0 }}>
-            <button
-              onClick={() => handleSetThumbnail(current.id)}
-              disabled={current.is_thumbnail}
-              style={{
-                flex: 1,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '13px 0', borderRadius: 16, border: 'none', cursor: current.is_thumbnail ? 'default' : 'pointer',
-                background: current.is_thumbnail ? 'rgba(252,76,2,0.15)' : 'rgba(255,255,255,0.08)',
-                color: current.is_thumbnail ? '#FC4C02' : 'white',
-                fontSize: 13, fontWeight: 600,
-              }}
-            >
-              <Star size={14} fill={current.is_thumbnail ? '#FC4C02' : 'none'} color={current.is_thumbnail ? '#FC4C02' : 'white'} />
-              {current.is_thumbnail ? 'Cover photo' : 'Set as cover'}
-            </button>
-            <button
-              onClick={() => handleDelete(current.id)}
-              style={{
-                width: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderRadius: 16, background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer',
-              }}
-            >
-              <Trash2 size={16} color="#888" />
-            </button>
-          </div>
+          {readOnly && <div style={{ paddingBottom: 32 }} />}
+
+          {/* Bottom actions — owner only */}
+          {!readOnly && (
+            <div style={{ padding: '12px 20px 32px', display: 'flex', gap: 10, flexShrink: 0 }}>
+              <button
+                onClick={() => handleSetThumbnail(current.id)}
+                disabled={current.is_thumbnail}
+                style={{
+                  flex: 1,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '13px 0', borderRadius: 16, border: 'none', cursor: current.is_thumbnail ? 'default' : 'pointer',
+                  background: current.is_thumbnail ? 'rgba(252,76,2,0.15)' : 'rgba(255,255,255,0.08)',
+                  color: current.is_thumbnail ? '#FC4C02' : 'white',
+                  fontSize: 13, fontWeight: 600,
+                }}
+              >
+                <Star size={14} fill={current.is_thumbnail ? '#FC4C02' : 'none'} color={current.is_thumbnail ? '#FC4C02' : 'white'} />
+                {current.is_thumbnail ? 'Cover photo' : 'Set as cover'}
+              </button>
+              <button
+                onClick={() => handleDelete(current.id)}
+                style={{
+                  width: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRadius: 16, background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer',
+                }}
+              >
+                <Trash2 size={16} color="#888" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </>

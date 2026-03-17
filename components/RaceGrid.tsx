@@ -249,11 +249,13 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
 function UpcomingSection({
   upcoming,
   dashboardLinks,
+  publicUsername,
   labelColor,
   sectionLabel,
 }: {
   upcoming: DbUserRace[]
   dashboardLinks: boolean
+  publicUsername?: string
   labelColor?: string
   sectionLabel: React.CSSProperties
 }) {
@@ -289,7 +291,11 @@ function UpcomingSection({
       {open && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {upcoming.map(r => {
-            const href = dashboardLinks ? `/dashboard/races/${r.id}` : undefined
+            const href = dashboardLinks
+              ? `/dashboard/races/${r.id}`
+              : publicUsername
+              ? `/${publicUsername}/races/${r.id}`
+              : undefined
             const row = (
               <div
                 style={{
@@ -358,11 +364,13 @@ function UpcomingSection({
 export default function RaceGrid({
   races,
   dashboardLinks = false,
+  publicUsername,
   labelColor,
   addRaceHref,
 }: {
   races: DbUserRace[]
   dashboardLinks?: boolean
+  publicUsername?: string
   labelColor?: string
   addRaceHref?: string
 }) {
@@ -394,6 +402,7 @@ export default function RaceGrid({
         <UpcomingSection
           upcoming={upcoming}
           dashboardLinks={dashboardLinks}
+          publicUsername={publicUsername}
           labelColor={labelColor}
           sectionLabel={sectionLabel}
         />
@@ -423,7 +432,13 @@ export default function RaceGrid({
               <RaceCard
                 key={r.id}
                 race={r}
-                href={dashboardLinks ? `/dashboard/races/${r.id}` : undefined}
+                href={
+                  dashboardLinks
+                    ? `/dashboard/races/${r.id}`
+                    : publicUsername
+                    ? `/${publicUsername}/races/${r.id}`
+                    : undefined
+                }
               />
             ))}
           </div>

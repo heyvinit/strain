@@ -7,6 +7,7 @@ import PassportCard, { computePassportStats } from '@/components/PassportCard'
 import RaceGrid from '@/components/RaceGrid'
 import FloatingShare from '@/components/FloatingShare'
 import { qrToSvg } from '@/lib/qr'
+import { ArrowLeft } from 'lucide-react'
 
 // ─── Metadata ──────────────────────────────────────────────────────────────────
 
@@ -32,8 +33,16 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default async function PublicPassportPage({ params }: { params: Promise<{ username: string }> }) {
+export default async function PublicPassportPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ username: string }>
+  searchParams: Promise<{ from?: string }>
+}) {
   const { username } = await params
+  const { from } = await searchParams
+  const fromDashboard = from === 'dashboard'
 
   const { data: user } = await supabaseAdmin
     .from('users')
@@ -70,6 +79,19 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
 
       <FloatingShare username={username} />
 
+      {/* Back to dashboard — only shown when navigating from dashboard */}
+      {fromDashboard && (
+        <div className="fixed top-5 left-5 z-50">
+          <Link
+            href="/dashboard"
+            className="w-12 h-12 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)' }}
+          >
+            <ArrowLeft size={18} color="white" />
+          </Link>
+        </div>
+      )}
+
       {/* Content */}
       <div className="relative z-10 px-5 pt-10 pb-16 flex flex-col items-center lg:pt-14">
         <div className="w-full max-w-[420px] lg:max-w-5xl">
@@ -84,7 +106,7 @@ export default async function PublicPassportPage({ params }: { params: Promise<{
             <div className="lg:flex-1 lg:min-w-0 flex flex-col gap-6">
 
               {allRaces.length > 0 && (
-                <RaceGrid races={allRaces} />
+                <RaceGrid races={allRaces} publicUsername={username} />
               )}
 
               {/* CTA */}
