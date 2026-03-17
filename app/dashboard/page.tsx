@@ -11,22 +11,17 @@ import { qrToSvg } from '@/lib/qr'
 
 export default async function DashboardPage() {
   const session = await auth()
+  const userId = session!.user.userId
+  const username = session!.user.username
 
-  const { data: user } = await supabaseAdmin
-    .from('users').select('*')
-    .eq('id', session!.user.userId)
-    .single<DbUser>()
-
-  const { data: races } = await supabaseAdmin
-    .from('user_races').select('*')
-    .eq('user_id', user?.id ?? '')
-    .order('race_date', { ascending: false })
+  const [{ data: user }, { data: races }, qrSvg] = await Promise.all([
+    supabaseAdmin.from('users').select('*').eq('id', userId).single<DbUser>(),
+    supabaseAdmin.from('user_races').select('*').eq('user_id', userId).order('race_date', { ascending: false }),
+    qrToSvg(`https://getstrain.app/${username}`),
+  ])
 
   const allRaces: DbUserRace[] = races ?? []
   const stats = computePassportStats(allRaces)
-
-  const profileUrl = `https://getstrain.app/${session!.user.username}`
-  const qrSvg = await qrToSvg(profileUrl)
 
   const isNewUser = allRaces.length === 0
   const hasPast = allRaces.some(r => r.status === 'completed')
@@ -40,7 +35,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between mb-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/strain-logo.svg" alt="Strain" style={{ height: 22, width: 'auto' }} />
-            <ShareButton username={session!.user.username} />
+            <ShareButton username={username} />
           </div>
 
           {user && !user.email && (
@@ -52,7 +47,7 @@ export default async function DashboardPage() {
               <PassportCard
                 user={user}
                 stats={stats}
-                username={session!.user.username}
+                username={username}
                 isOwner
                 qrSvg={qrSvg}
               />

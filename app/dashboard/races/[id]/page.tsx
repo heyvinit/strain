@@ -31,25 +31,18 @@ function distanceLabel(d: string): string {
 
 export default async function RaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const session = await auth()
 
-  const { data: race } = await supabaseAdmin
-    .from('user_races')
-    .select('*')
-    .eq('id', id)
-    .single<DbUserRace>()
+  const [session, { data: race }, { data: photos }] = await Promise.all([
+    auth(),
+    supabaseAdmin.from('user_races').select('*').eq('id', id).single<DbUserRace>(),
+    supabaseAdmin.from('race_photos').select('*').eq('race_id', id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+  ])
 
   if (!race) notFound()
 
-  const { data: photos } = await supabaseAdmin
-    .from('race_photos')
-    .select('*')
-    .eq('race_id', id)
-    .order('sort_order', { ascending: true })
-    .order('created_at', { ascending: true })
-
   const racePhotos: DbRacePhoto[] = photos ?? []
-
   const isOwner = session?.user.userId === race.user_id
 
   const statRows = [

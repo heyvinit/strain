@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Camera, X, Star, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import NextImage from 'next/image'
 import type { DbRacePhoto } from '@/lib/supabase'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -162,12 +163,12 @@ export default function RacePhotoGallery({
               cursor: 'pointer',
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={thumbSrc(photo.photo_url, 300)}
+            <NextImage
+              src={thumbSrc(photo.photo_url, 300, 300)}
               alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              loading="lazy"
+              fill
+              sizes="(max-width: 640px) 30vw, 120px"
+              style={{ objectFit: 'cover' }}
             />
             {photo.is_thumbnail && (
               <div

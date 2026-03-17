@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import type { DbUserRace } from '@/lib/supabase'
 import Link from 'next/link'
+import Image from 'next/image'
 
 // ─── Image transform helper ───────────────────────────────────────────────────
 
@@ -72,18 +73,12 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
     >
       {/* Race photo — shown when user has uploaded one */}
       {race.photo_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={cardThumbSrc(race.photo_url)}
           alt=""
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-          loading="lazy"
+          fill
+          sizes="(max-width: 640px) 45vw, 200px"
+          style={{ objectFit: 'cover' }}
         />
       )}
 

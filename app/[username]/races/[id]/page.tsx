@@ -34,28 +34,18 @@ export default async function PublicRaceDetailPage({
   const { username, id } = await params
 
   const { data: user } = await supabaseAdmin
-    .from('users')
-    .select('id')
-    .eq('username', username)
-    .single()
+    .from('users').select('id').eq('username', username).single()
 
   if (!user) notFound()
 
-  const { data: race } = await supabaseAdmin
-    .from('user_races')
-    .select('*')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .single<DbUserRace>()
+  const [{ data: race }, { data: photos }] = await Promise.all([
+    supabaseAdmin.from('user_races').select('*').eq('id', id).eq('user_id', user.id).single<DbUserRace>(),
+    supabaseAdmin.from('race_photos').select('*').eq('race_id', id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+  ])
 
   if (!race) notFound()
-
-  const { data: photos } = await supabaseAdmin
-    .from('race_photos')
-    .select('*')
-    .eq('race_id', id)
-    .order('sort_order', { ascending: true })
-    .order('created_at', { ascending: true })
 
   const racePhotos: DbRacePhoto[] = photos ?? []
 

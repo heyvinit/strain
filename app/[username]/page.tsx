@@ -45,24 +45,17 @@ export default async function PublicPassportPage({
   const fromDashboard = from === 'dashboard'
 
   const { data: user } = await supabaseAdmin
-    .from('users')
-    .select('*')
-    .eq('username', username)
-    .single<DbUser>()
+    .from('users').select('*').eq('username', username).single<DbUser>()
 
   if (!user) notFound()
 
-  const { data: races } = await supabaseAdmin
-    .from('user_races')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('race_date', { ascending: false })
+  const [{ data: races }, qrSvg] = await Promise.all([
+    supabaseAdmin.from('user_races').select('*').eq('user_id', user.id).order('race_date', { ascending: false }),
+    qrToSvg(`https://getstrain.app/${username}`),
+  ])
 
   const allRaces: DbUserRace[] = races ?? []
   const stats = computePassportStats(allRaces)
-
-  const profileUrl = `https://getstrain.app/${username}`
-  const qrSvg = await qrToSvg(profileUrl)
 
   return (
     <div
