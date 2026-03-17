@@ -314,23 +314,18 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
       <button
         onClick={() => setEditing(true)}
         className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium active:scale-[0.98] transition-transform"
-        style={{ color: '#111', background: 'white', border: '1px solid #F0F0EE' }}
+        style={{ color: '#555', background: 'white', border: '1px solid #F0F0EE' }}
       >
         <Pencil size={13} />
         Edit race
       </button>
       <button
         onClick={() => setConfirming(true)}
-        className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium active:scale-[0.98] transition-transform"
-        style={{
-          color: '#aaa',
-          background: 'transparent',
-          flex: '0 0 auto',
-          paddingLeft: 16,
-          paddingRight: 16,
-        }}
+        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium active:scale-[0.98] transition-transform"
+        style={{ color: '#E55', background: '#FFF0EE', border: '1px solid #FFE0DC' }}
       >
         <Trash2 size={13} />
+        Delete race
       </button>
     </div>
   )
