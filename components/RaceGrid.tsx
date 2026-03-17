@@ -26,21 +26,13 @@ function cardThumbSrc(url: string): string {
 /** How many fallback images exist per category (update as images are added) */
 const FALLBACK_COUNTS: Record<string, number> = {
   hyrox: 6,
-  // marathon: 5,
-  // 'half-marathon': 5,
-  // '10k': 5,
-  // '5k': 5,
-  // other: 5,
+  running: 10,   // shared pool for marathon / half / 10k / 5k / other running
 }
 
 function getFallbackCategory(race: DbUserRace): string {
   if (race.sport === 'hyrox') return 'hyrox'
-  const d = (race.distance ?? '').toLowerCase()
-  if (d.includes('42') || (d.includes('marathon') && !d.includes('half'))) return 'marathon'
-  if (d.includes('21') || d.includes('half')) return 'half-marathon'
-  if (d.includes('10')) return '10k'
-  if (d.includes('5')) return '5k'
-  return 'other'
+  // All running distances share the same branded pool
+  return 'running'
 }
 
 function deterministicIndex(id: string, max: number): number {
