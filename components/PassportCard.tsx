@@ -1,4 +1,6 @@
 import type { DbUser, DbUserRace } from '@/lib/supabase'
+import { resolveTheme } from '@/lib/passport-themes'
+import type { PassportTheme } from '@/lib/passport-themes'
 import QrButton from './QrButton'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -171,13 +173,16 @@ export default function PassportCard({
   username,
   isOwner = false,
   qrSvg,
+  theme: themeProp,
 }: {
   user: DbUser
   stats: PassportStats
   username: string
   isOwner?: boolean
   qrSvg?: string
+  theme?: PassportTheme
 }) {
+  const theme = themeProp ?? resolveTheme(user.passport_theme)
   const PB_SLOTS = [
     { label: 'Marathon',      value: stats.pbs.fm },
     { label: 'Half Marathon', value: stats.pbs.hm },
@@ -210,21 +215,26 @@ export default function PassportCard({
   const padLen = Math.max(0, 50 - prefix.length - suffix.length)
   const mrz = `${prefix}${'<'.repeat(padLen)}${suffix}`
 
+  const bgImage = theme.texture
+    ? `${theme.texture}, ${theme.gradient}`
+    : theme.gradient
+
   return (
     <div
       id="passport-card"
       className="rounded-3xl overflow-hidden mb-6 w-full mx-auto"
       style={{
         maxWidth: 360,
-        background: 'radial-gradient(ellipse at 18% 0%, #232323 0%, #0e0e0e 55%, #161616 100%)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)',
+        backgroundImage: bgImage,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.12)',
+        transition: 'background-image 0.25s ease',
       }}
     >
       <div className="px-5 pt-5 pb-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-0.5" style={{ color: '#FC4C02' }}>
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-0.5" style={{ color: theme.accent }}>
               Athlete Passport
             </p>
             <p className="text-[10px] tracking-widest uppercase" style={{ color: '#444' }}>
@@ -260,14 +270,14 @@ export default function PassportCard({
             { label: 'COMPLETED', value: String(stats.completed) },
             { label: 'UPCOMING', value: String(stats.upcoming) },
           ].map(({ label, value }) => (
-            <div key={label} className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <div key={label} className="rounded-2xl p-3" style={{ background: theme.cellBg }}>
               <p className="text-[9px] font-bold tracking-widest mb-1" style={{ color: '#555' }}>{label}</p>
               <p className="text-sm font-bold text-white">{value}</p>
             </div>
           ))}
 
           {/* Countries box with stacked flags */}
-          <div className="rounded-2xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <div className="rounded-2xl p-3" style={{ background: theme.cellBg }}>
             <p className="text-[9px] font-bold tracking-widest mb-1.5" style={{ color: '#555' }}>COUNTRIES</p>
             {visibleFlags.length > 0 ? (
               <div className="flex items-center" style={{ gap: 0 }}>
@@ -278,7 +288,7 @@ export default function PassportCard({
                     style={{
                       width: 22, height: 22,
                       background: 'rgba(255,255,255,0.06)',
-                      border: '1.5px solid #0e0e0e',
+                      border: `1.5px solid ${theme.flagBorder}`,
                       marginLeft: i > 0 ? -5 : 0,
                       fontSize: 13,
                       lineHeight: 1,
@@ -295,7 +305,7 @@ export default function PassportCard({
                     style={{
                       width: 22, height: 22,
                       background: 'rgba(255,255,255,0.06)',
-                      border: '1.5px solid #0e0e0e',
+                      border: `1.5px solid ${theme.flagBorder}`,
                       marginLeft: -5,
                       color: '#666',
                       position: 'relative',
@@ -314,11 +324,11 @@ export default function PassportCard({
 
         {/* PBs — always shown to owner, only filled rows shown publicly */}
         {(isOwner || hasPbs) && pbRows.length > 0 && (
-          <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: theme.cellBg }}>
             <p className="text-[9px] font-bold tracking-widest px-3 pt-3 pb-2" style={{ color: '#555' }}>PERSONAL BESTS</p>
             {pbRows.map((pb, i) => (
               <div key={pb.label}>
-                {i > 0 && <div style={{ height: 1, background: 'rgba(255,255,255,0.04)' }} />}
+                {i > 0 && <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />}
                 <div className="flex items-center justify-between px-3 py-2">
                   <span className="text-xs" style={{ color: pb.value ? '#666' : '#333' }}>{pb.label}</span>
                   <span
@@ -336,7 +346,7 @@ export default function PassportCard({
       </div>
 
       {/* MRZ — single full-width line */}
-      <div className="px-5 py-3 overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', borderTop: '1px solid #1e1e1e' }}>
+      <div className="px-5 py-3 overflow-hidden" style={{ background: theme.mrzBg, borderTop: `1px solid ${theme.mrzBorder}` }}>
         <p
           className="font-mono text-[9px] tracking-[0.12em] whitespace-nowrap overflow-hidden"
           style={{ color: '#2d2d2d' }}

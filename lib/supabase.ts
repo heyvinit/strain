@@ -26,6 +26,7 @@ export interface DbUser {
   email: string | null
   email_pre_race: boolean
   email_post_race: boolean
+  passport_theme: string | null
   created_at: string
 }
 

@@ -3,7 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import type { DbUserRace, DbUser } from '@/lib/supabase'
 import Link from 'next/link'
 import ShareButton from '@/components/ShareButton'
-import PassportCard, { computePassportStats } from '@/components/PassportCard'
+import { computePassportStats } from '@/components/PassportCard'
+import TappablePassport from '@/components/TappablePassport'
 import EmailPrompt from '@/components/EmailPrompt'
 import RaceGrid from '@/components/RaceGrid'
 import { qrToSvg } from '@/lib/qr'
@@ -43,15 +44,12 @@ export default async function DashboardPage() {
           )}
 
           {user && (
-            <>
-              <PassportCard
-                user={user}
-                stats={stats}
-                username={username}
-                isOwner
-                qrSvg={qrSvg}
-              />
-            </>
+            <TappablePassport
+              user={user}
+              stats={stats}
+              username={username}
+              qrSvg={qrSvg}
+            />
           )}
         </div>
 
