@@ -111,10 +111,7 @@ export default async function PublicRaceDetailPage({
               {race.status === 'completed' ? 'Completed' : 'Upcoming'}
             </span>
             {race.is_pb && (
-              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
-                style={{ background: '#2a1a0a', color: '#FC4C02' }}>
-                Personal Best
-              </span>
+              <img src="/pr-badge.svg" alt="Personal Record" width={28} height={28} style={{ display: 'block' }} />
             )}
           </div>
 

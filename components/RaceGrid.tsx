@@ -146,9 +146,7 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
           <div />
         )}
         {race.is_pb && (
-          <div style={{ background: '#FC4C02', borderRadius: 20, padding: '3px 8px' }}>
-            <span style={{ color: 'white', fontSize: 9, fontWeight: 800 }}>PB</span>
-          </div>
+          <img src="/pr-badge.svg" alt="Personal Record" width={26} height={26} style={{ display: 'block' }} />
         )}
       </div>
 
