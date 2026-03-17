@@ -27,11 +27,12 @@ function cardThumbSrc(url: string): string {
 const FALLBACK_COUNTS: Record<string, number> = {
   hyrox: 6,
   running: 10,   // shared pool for marathon / half / 10k / 5k / other running
+  cycling: 6,
 }
 
 function getFallbackCategory(race: DbUserRace): string {
   if (race.sport === 'hyrox') return 'hyrox'
-  // All running distances share the same branded pool
+  if (race.sport === 'cycling') return 'cycling'
   return 'running'
 }
 
