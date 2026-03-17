@@ -28,11 +28,13 @@ const FALLBACK_COUNTS: Record<string, number> = {
   hyrox: 6,
   running: 10,   // shared pool for marathon / half / 10k / 5k / other running
   cycling: 6,
+  triathlon: 6,
 }
 
 function getFallbackCategory(race: DbUserRace): string {
   if (race.sport === 'hyrox') return 'hyrox'
   if (race.sport === 'cycling') return 'cycling'
+  if (race.sport === 'triathlon') return 'triathlon'
   return 'running'
 }
 
