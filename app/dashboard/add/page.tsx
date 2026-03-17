@@ -193,7 +193,7 @@ export default function AddRacePage() {
   // ── Upcoming form state ──────────────────────────────────────────────────────
   const [upcomingSport, setUpcomingSport] = useState<SportKey>('running')
   const [upcoming, setUpcoming] = useState({
-    raceName: '', raceDate: '', distance: '10K', distanceCustom: '', bibNumber: '', country: '',
+    raceName: '', raceDate: '', distance: '10K', distanceCustom: '', bibNumber: '', country: '', resultUrl: '',
   })
   const [upcomingSaving, setUpcomingSaving] = useState(false)
   const [upcomingError, setUpcomingError] = useState('')
@@ -211,7 +211,7 @@ export default function AddRacePage() {
   const [manualSport, setManualSport] = useState<SportKey>('running')
   const [manual, setManual] = useState({
     raceName: '', raceDate: '', distance: '10K', distanceCustom: '',
-    netTime: '', pace: '', overallPosition: '', bibNumber: '', category: '', country: '',
+    netTime: '', pace: '', overallPosition: '', bibNumber: '', category: '', country: '', resultUrl: '',
   })
   const [manualSaving, setManualSaving] = useState(false)
   const [manualError, setManualError] = useState('')
@@ -288,6 +288,7 @@ export default function AddRacePage() {
         distance,
         bibNumber: upcoming.bibNumber,
         country: upcoming.country,
+        result_url: upcoming.resultUrl || null,
         status: 'upcoming',
         runnerName: '',
       })
@@ -410,7 +411,7 @@ export default function AddRacePage() {
         overallPosition: manual.overallPosition, bibNumber: manual.bibNumber,
         category: manual.category, country: manual.country,
         platform: 'Manual', runnerName: '', status: 'completed',
-        ...(scrapeFallback && scrapeSourceUrl ? { result_url: scrapeSourceUrl } : {}),
+        result_url: manual.resultUrl || (scrapeFallback && scrapeSourceUrl ? scrapeSourceUrl : null),
       })
       if (!json.success) { setManualError(json.error ?? 'Failed to save.'); setManualSaving(false); return }
       setDone(true)
@@ -511,6 +512,13 @@ export default function AddRacePage() {
               value={upcoming.country}
               onChange={v => setUpcoming(s => ({ ...s, country: v }))}
               placeholder="e.g. India, UAE, USA"
+              optional
+            />
+            <Field
+              label="Result link"
+              value={upcoming.resultUrl}
+              onChange={v => setUpcoming(s => ({ ...s, resultUrl: v }))}
+              placeholder="https://results.example.com/..."
               optional
             />
           </div>
@@ -785,6 +793,7 @@ export default function AddRacePage() {
                 <Field label="BIB" value={manual.bibNumber} onChange={v => setManual(s => ({ ...s, bibNumber: v }))} optional />
                 <Field label="Category" value={manual.category} onChange={v => setManual(s => ({ ...s, category: v }))} placeholder="e.g. M40-44" optional />
                 <Field label="Country" value={manual.country} onChange={v => setManual(s => ({ ...s, country: v }))} placeholder="e.g. India, UAE, USA" optional />
+                <Field label="Result link" value={manual.resultUrl} onChange={v => setManual(s => ({ ...s, resultUrl: v }))} placeholder="https://results.example.com/..." optional />
               </div>
 
               {manualError && (

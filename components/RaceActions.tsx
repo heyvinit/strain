@@ -93,6 +93,7 @@ export interface RaceActionsProps {
     overallPosition?: string | null
     categoryPosition?: string | null
     category?: string | null
+    resultUrl?: string | null
   }
 }
 
@@ -118,6 +119,7 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
     overallPosition: race?.overallPosition ?? '',
     categoryPosition: race?.categoryPosition ?? '',
     category: race?.category ?? '',
+    resultUrl: race?.resultUrl ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -153,6 +155,7 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
         overallPosition: form.overallPosition || null,
         categoryPosition: form.categoryPosition || null,
         category: form.category || null,
+        result_url: form.resultUrl || null,
       }),
     })
     const json = await res.json()
@@ -275,6 +278,8 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
               <Field label="Category" value={form.category ?? ''} onChange={v => setForm(f => ({ ...f, category: v }))} placeholder="e.g. M35-39" optional />
             </>
           )}
+
+          <Field label="Result link" value={form.resultUrl ?? ''} onChange={v => setForm(f => ({ ...f, resultUrl: v }))} placeholder="https://results.example.com/..." optional />
         </div>
 
         {saveError && <p className="text-sm mb-3 px-1" style={{ color: '#EF4444' }}>{saveError}</p>}

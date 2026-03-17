@@ -78,7 +78,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!owner) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const body = await req.json()
-  const { raceName, raceDate, distance, netTime, gunTime, pace, bibNumber, overallPosition, categoryPosition, category, status, sport, country } = body
+  const { raceName, raceDate, distance, netTime, gunTime, pace, bibNumber, overallPosition, categoryPosition, category, status, sport, country, result_url } = body
 
   const { data, error } = await supabaseAdmin
     .from('user_races')
@@ -97,6 +97,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       status: status || undefined,
       sport: ['running','hyrox','triathlon','ocr','cycling','other'].includes(sport) ? sport : undefined,
       country: country ?? null,
+      result_url: result_url !== undefined ? (result_url || null) : undefined,
     })
     .eq('id', id)
     .select()

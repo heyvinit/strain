@@ -179,6 +179,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
               overallPosition: race.overall_position,
               categoryPosition: race.category_position,
               category: race.category,
+              resultUrl: race.result_url,
             }}
           />
         </div>
