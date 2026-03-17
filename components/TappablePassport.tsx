@@ -45,8 +45,8 @@ export default function TappablePassport({
         onClick={() => setTapped(t => !t)}
         style={{
           cursor: 'pointer',
-          transform: tapped ? 'scale(0.975)' : 'scale(1)',
-          transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          opacity: tapped ? 0.9 : 1,
+          transition: 'opacity 0.15s ease',
           WebkitTapHighlightColor: 'transparent',
         }}
       >

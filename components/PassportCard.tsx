@@ -227,7 +227,6 @@ export default function PassportCard({
         maxWidth: 360,
         backgroundImage: bgImage,
         boxShadow: '0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.12)',
-        transition: 'background-image 0.25s ease',
       }}
     >
       <div className="px-5 pt-5 pb-4">
