@@ -215,6 +215,9 @@ export default function AddRacePage() {
   })
   const [manualSaving, setManualSaving] = useState(false)
   const [manualError, setManualError] = useState('')
+  // Scrape-fallback state — set when URL scraping fails and we drop into manual
+  const [scrapeFallback, setScrapeFallback] = useState(false)
+  const [scrapeSourceUrl, setScrapeSourceUrl] = useState('')
 
   // ── Strava import state ───────────────────────────────────────────────────────
   const [stravaLoading, setStravaLoading] = useState(false)
@@ -225,6 +228,38 @@ export default function AddRacePage() {
   const [stravaImported, setStravaImported] = useState(0)
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  /** Best-effort extraction of race name + year from a URL when scraping fails */
+  function extractFromUrl(urlStr: string): { raceName: string; raceDate: string } {
+    try {
+      const u = new URL(urlStr)
+      const segments = u.pathname.split('/').filter(Boolean)
+      const yearSeg = segments.find(s => /^20\d{2}$/.test(s))
+      const nameSeg = segments
+        .filter(s => !/^20\d{2}$/.test(s) && !/^\d+$/.test(s) && s.length > 3)
+        .sort((a, b) => b.length - a.length)[0]
+      const raceName = nameSeg
+        ? decodeURIComponent(nameSeg).replace(/[-_+]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim()
+        : ''
+      const raceDate = yearSeg ? `${yearSeg}-01-01` : ''
+      return { raceName, raceDate }
+    } catch {
+      return { raceName: '', raceDate: '' }
+    }
+  }
+
+  function fallbackToManual(fromUrl: string) {
+    const extracted = extractFromUrl(fromUrl)
+    setManual(m => ({
+      ...m,
+      raceName: extracted.raceName,
+      raceDate: extracted.raceDate,
+    }))
+    setScrapeSourceUrl(fromUrl)
+    setScrapeFallback(true)
+    setUrlStep('input')
+    setPastMethod('manual')
+  }
 
   async function saveToPassport(payload: Record<string, unknown>) {
     const res = await fetch('/api/passport/add', {
@@ -279,12 +314,11 @@ export default function AddRacePage() {
         body: JSON.stringify({ url }),
       })
       const json = await res.json()
-      if (!json.success) { setUrlError(json.error ?? 'Could not extract race data.'); setUrlStep('error'); return }
+      if (!json.success) { fallbackToManual(url); return }
       setPreview(json.data)
       setUrlStep('preview')
     } catch {
-      setUrlError('Something went wrong. Please try again.')
-      setUrlStep('error')
+      fallbackToManual(url)
     }
   }
 
@@ -376,6 +410,7 @@ export default function AddRacePage() {
         overallPosition: manual.overallPosition, bibNumber: manual.bibNumber,
         category: manual.category, country: manual.country,
         platform: 'Manual', runnerName: '', status: 'completed',
+        ...(scrapeFallback && scrapeSourceUrl ? { result_url: scrapeSourceUrl } : {}),
       })
       if (!json.success) { setManualError(json.error ?? 'Failed to save.'); setManualSaving(false); return }
       setDone(true)
@@ -421,7 +456,7 @@ export default function AddRacePage() {
         {(['upcoming', 'past'] as const).map(t => (
           <button
             key={t}
-            onClick={() => { setTab(t); setPastMethod(null) }}
+            onClick={() => { setTab(t); setPastMethod(null); setScrapeFallback(false); setScrapeSourceUrl('') }}
             className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
             style={{
               background: tab === t ? (t === 'upcoming' ? '#FC4C02' : '#111') : 'transparent',
@@ -666,6 +701,22 @@ export default function AddRacePage() {
           {/* ── Manual flow ── */}
           {pastMethod === 'manual' && (
             <form onSubmit={handleManualSave}>
+              {scrapeFallback && (
+                <div
+                  className="rounded-2xl px-4 py-3 mb-4 flex items-start gap-3"
+                  style={{ background: '#FFF5F2', border: '1px solid #FCDDD4' }}
+                >
+                  <span className="text-base leading-none mt-0.5">⚡</span>
+                  <div>
+                    <p className="text-xs font-semibold" style={{ color: '#FC4C02' }}>
+                      Couldn&apos;t read that link automatically
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: '#888' }}>
+                      We pre-filled what we could — fill in the rest and save.
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="rounded-3xl p-5 mb-4 flex flex-col gap-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
                 <SportPicker
                   value={manualSport}
@@ -711,7 +762,7 @@ export default function AddRacePage() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setPastMethod(null)}
+                  onClick={() => { setPastMethod(null); setScrapeFallback(false); setScrapeSourceUrl('') }}
                   className="w-12 flex items-center justify-center rounded-2xl"
                   style={{ background: 'white', border: '1px solid #F0F0EE' }}
                 >
