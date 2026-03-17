@@ -39,7 +39,7 @@ export default function TappablePassport({
   }, [tapped])
 
   return (
-    <div ref={wrapperRef} style={{ paddingBottom: 52 }}>
+    <div ref={wrapperRef}>
       {/* Tappable card */}
       <div
         onClick={() => setTapped(t => !t)}
@@ -53,16 +53,15 @@ export default function TappablePassport({
         <PassportCard user={user} stats={stats} username={username} isOwner qrSvg={qrSvg} />
       </div>
 
-      {/* Customize pill — slides up from below */}
+      {/* Customize pill — height animates so it takes zero space when hidden */}
       <div
         style={{
+          height: tapped ? 52 : 0,
+          overflow: 'hidden',
+          transition: 'height 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)',
           display: 'flex',
           justifyContent: 'center',
-          marginTop: -8,
-          opacity: tapped ? 1 : 0,
-          transform: tapped ? 'translateY(0)' : 'translateY(-8px)',
-          transition: 'opacity 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          pointerEvents: tapped ? 'auto' : 'none',
+          alignItems: 'center',
         }}
       >
         <button
@@ -81,6 +80,9 @@ export default function TappablePassport({
             cursor: 'pointer',
             whiteSpace: 'nowrap',
             boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            opacity: tapped ? 1 : 0,
+            transform: tapped ? 'scale(1)' : 'scale(0.9)',
+            transition: 'opacity 0.18s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
           }}
         >
           <Sparkles size={13} />

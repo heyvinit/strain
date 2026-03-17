@@ -1,5 +1,5 @@
 import type { DbUser, DbUserRace } from '@/lib/supabase'
-import { resolveTheme } from '@/lib/passport-themes'
+import { resolveUserTheme } from '@/lib/passport-themes'
 import type { PassportTheme } from '@/lib/passport-themes'
 import QrButton from './QrButton'
 
@@ -182,7 +182,7 @@ export default function PassportCard({
   qrSvg?: string
   theme?: PassportTheme
 }) {
-  const theme = themeProp ?? resolveTheme(user.passport_theme)
+  const theme = themeProp ?? resolveUserTheme(user.passport_theme)
   const PB_SLOTS = [
     { label: 'Marathon',      value: stats.pbs.fm },
     { label: 'Half Marathon', value: stats.pbs.hm },

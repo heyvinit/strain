@@ -6,8 +6,140 @@ import { ArrowLeft, Check, Loader2 } from 'lucide-react'
 import PassportCard from './PassportCard'
 import type { PassportStats } from './PassportCard'
 import type { DbUser } from '@/lib/supabase'
-import { PASSPORT_THEMES, THEME_KEYS, resolveTheme } from '@/lib/passport-themes'
-import type { PassportThemeKey } from '@/lib/passport-themes'
+import {
+  PASSPORT_COLORS, PASSPORT_TEXTURES,
+  COLOR_KEYS, TEXTURE_KEYS,
+  resolveTheme, parseThemeString, buildThemeString,
+} from '@/lib/passport-themes'
+import type { PassportColorKey, PassportTextureKey } from '@/lib/passport-themes'
+
+// ─── Texture preview swatch ────────────────────────────────────────────────────
+
+function TextureSwatch({ textureKey, selected, onSelect }: {
+  textureKey: PassportTextureKey
+  selected: boolean
+  onSelect: () => void
+}) {
+  const t = PASSPORT_TEXTURES[textureKey]
+  const bg = t.pattern ? `${t.pattern}, #1a1a1a` : '#1a1a1a'
+
+  return (
+    <button
+      onClick={onSelect}
+      style={{
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 7,
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
+    >
+      <div
+        style={{
+          width: 68,
+          height: 68,
+          borderRadius: 16,
+          backgroundImage: bg,
+          boxShadow: selected
+            ? '0 0 0 2.5px #FC4C02, 0 4px 12px rgba(0,0,0,0.15)'
+            : '0 2px 8px rgba(0,0,0,0.1)',
+          border: selected ? 'none' : '1.5px solid #ECECEA',
+          transition: 'box-shadow 0.18s ease',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {selected && (
+          <div style={{ position: 'absolute', bottom: 5, right: 5, width: 16, height: 16, borderRadius: '50%', background: '#FC4C02', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Check size={9} color="white" strokeWidth={3} />
+          </div>
+        )}
+      </div>
+      <span style={{ fontSize: 11, fontWeight: selected ? 700 : 500, color: selected ? '#111' : '#888', transition: 'color 0.15s' }}>
+        {t.name}
+      </span>
+    </button>
+  )
+}
+
+// ─── Color preview swatch ──────────────────────────────────────────────────────
+
+function ColorSwatch({ colorKey, selected, onSelect }: {
+  colorKey: PassportColorKey
+  selected: boolean
+  onSelect: () => void
+}) {
+  const c = PASSPORT_COLORS[colorKey]
+
+  return (
+    <button
+      onClick={onSelect}
+      style={{
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 7,
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
+    >
+      <div
+        style={{
+          width: 68,
+          height: 68,
+          borderRadius: 16,
+          backgroundImage: c.gradient,
+          boxShadow: selected
+            ? `0 0 0 2.5px ${c.accent}, 0 4px 12px rgba(0,0,0,0.2)`
+            : '0 2px 8px rgba(0,0,0,0.12)',
+          transition: 'box-shadow 0.18s ease',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Accent dot */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: c.accent }} />
+        {selected && (
+          <div style={{ position: 'absolute', bottom: 5, right: 5, width: 16, height: 16, borderRadius: '50%', background: c.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Check size={9} color="white" strokeWidth={3} />
+          </div>
+        )}
+      </div>
+      <span style={{ fontSize: 11, fontWeight: selected ? 700 : 500, color: selected ? '#111' : '#888', transition: 'color 0.15s' }}>
+        {c.name}
+      </span>
+    </button>
+  )
+}
+
+// ─── Horizontal scroll row ─────────────────────────────────────────────────────
+
+function ScrollRow({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        overflowX: 'auto',
+        paddingBottom: 4,
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'],
+      }}
+      className="hide-scrollbar"
+    >
+      {children}
+    </div>
+  )
+}
+
+// ─── Main picker ───────────────────────────────────────────────────────────────
 
 export default function PassportStylePicker({
   user,
@@ -21,19 +153,28 @@ export default function PassportStylePicker({
   qrSvg?: string
 }) {
   const router = useRouter()
-  const [selectedKey, setSelectedKey] = useState<PassportThemeKey>(
-    (user.passport_theme as PassportThemeKey) ?? 'midnight'
-  )
-  const [pulseKey, setPulseKey] = useState(0)  // triggers card pop animation
+  const initial = parseThemeString(user.passport_theme)
+  const [colorKey, setColorKey] = useState<PassportColorKey>(initial.colorKey)
+  const [textureKey, setTextureKey] = useState<PassportTextureKey>(initial.textureKey)
+  const [pulseKey, setPulseKey] = useState(0)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  const isDirty = selectedKey !== (user.passport_theme ?? 'midnight')
+  const isDirty = buildThemeString(colorKey, textureKey) !== (user.passport_theme ?? 'midnight:none')
+    && buildThemeString(colorKey, textureKey) !== user.passport_theme
 
-  function pickTheme(key: PassportThemeKey) {
-    if (key === selectedKey) return
-    setSelectedKey(key)
-    setPulseKey(k => k + 1)  // triggers re-mount for animation
+  const currentTheme = resolveTheme(colorKey, textureKey)
+
+  function pickColor(key: PassportColorKey) {
+    if (key === colorKey) return
+    setColorKey(key)
+    setPulseKey(k => k + 1)
+  }
+
+  function pickTexture(key: PassportTextureKey) {
+    if (key === textureKey) return
+    setTextureKey(key)
+    setPulseKey(k => k + 1)
   }
 
   async function handleApply() {
@@ -41,13 +182,11 @@ export default function PassportStylePicker({
     await fetch('/api/user/theme', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ theme: selectedKey }),
+      body: JSON.stringify({ theme: buildThemeString(colorKey, textureKey) }),
     })
     setSaved(true)
     setTimeout(() => router.push('/dashboard'), 800)
   }
-
-  const selectedTheme = resolveTheme(selectedKey)
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-10" style={{ background: '#FAFAF8' }}>
@@ -67,136 +206,64 @@ export default function PassportStylePicker({
       <div
         key={pulseKey}
         className="mb-8"
-        style={{
-          animation: 'passportPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
+        style={{ animation: 'passportPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
       >
-        <PassportCard
-          user={user}
-          stats={stats}
-          username={username}
-          isOwner
-          qrSvg={qrSvg}
-          theme={selectedTheme}
-        />
+        <PassportCard user={user} stats={stats} username={username} isOwner qrSvg={qrSvg} theme={currentTheme} />
       </div>
 
-      {/* Theme selector */}
-      <div className="mb-3">
+      {/* ── Texture picker ── */}
+      <div className="mb-6">
         <p className="text-[10px] font-bold tracking-widest uppercase mb-4" style={{ color: '#aaa' }}>
-          Choose a style
+          Texture
         </p>
+        <ScrollRow>
+          {TEXTURE_KEYS.map(key => (
+            <TextureSwatch
+              key={key}
+              textureKey={key}
+              selected={key === textureKey}
+              onSelect={() => pickTexture(key)}
+            />
+          ))}
+        </ScrollRow>
+      </div>
 
-        {/* Horizontal scroll row */}
-        <div
-          className="flex gap-3 overflow-x-auto pb-2"
-          style={{
-            scrollSnapType: 'x mandatory',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          {THEME_KEYS.map(key => {
-            const t = PASSPORT_THEMES[key]
-            const isSelected = key === selectedKey
-            const bgImage = t.texture ? `${t.texture}, ${t.gradient}` : t.gradient
-
-            return (
-              <button
-                key={key}
-                onClick={() => pickTheme(key)}
-                style={{
-                  scrollSnapAlign: 'start',
-                  flexShrink: 0,
-                  width: 76,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 8,
-                  background: 'none',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                }}
-              >
-                {/* Mini card swatch */}
-                <div
-                  style={{
-                    width: 76,
-                    height: 100,
-                    borderRadius: 14,
-                    backgroundImage: bgImage,
-                    position: 'relative',
-                    boxShadow: isSelected
-                      ? `0 0 0 2.5px ${t.accent}, 0 4px 16px rgba(0,0,0,0.2)`
-                      : '0 2px 8px rgba(0,0,0,0.12)',
-                    transition: 'box-shadow 0.2s ease',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* Accent stripe at top */}
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: t.accent, opacity: 0.9 }} />
-
-                  {/* Checkmark if selected */}
-                  {isSelected && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 7,
-                        right: 7,
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        background: t.accent,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Check size={10} color="white" strokeWidth={2.5} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Theme name */}
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: isSelected ? 700 : 500,
-                    color: isSelected ? '#111' : '#888',
-                    transition: 'color 0.15s',
-                  }}
-                >
-                  {t.name}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+      {/* ── Color picker ── */}
+      <div className="mb-8">
+        <p className="text-[10px] font-bold tracking-widest uppercase mb-4" style={{ color: '#aaa' }}>
+          Color
+        </p>
+        <ScrollRow>
+          {COLOR_KEYS.map(key => (
+            <ColorSwatch
+              key={key}
+              colorKey={key}
+              selected={key === colorKey}
+              onSelect={() => pickColor(key)}
+            />
+          ))}
+        </ScrollRow>
       </div>
 
       {/* Apply button */}
-      <div className="mt-6">
-        <button
-          onClick={handleApply}
-          disabled={saving || saved || !isDirty}
-          className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-semibold text-white disabled:opacity-40 transition-opacity"
-          style={{ background: saved ? '#22c55e' : '#111' }}
-        >
-          {saving && !saved && <Loader2 size={15} className="animate-spin" />}
-          {saved && <Check size={15} />}
-          {saved ? 'Applied!' : saving ? 'Saving…' : isDirty ? 'Apply style' : 'No changes'}
-        </button>
-      </div>
+      <button
+        onClick={handleApply}
+        disabled={saving || saved || !isDirty}
+        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-semibold text-white disabled:opacity-40 transition-all duration-200"
+        style={{ background: saved ? '#22c55e' : '#111' }}
+      >
+        {saving && !saved && <Loader2 size={15} className="animate-spin" />}
+        {saved && <Check size={15} />}
+        {saved ? 'Applied!' : saving ? 'Saving…' : isDirty ? 'Apply style' : 'No changes'}
+      </button>
 
       <style>{`
         @keyframes passportPop {
-          0%   { transform: scale(0.96); opacity: 0.85; }
+          0%   { transform: scale(0.96); opacity: 0.8; }
           100% { transform: scale(1);    opacity: 1; }
         }
-        /* Hide scrollbar on the theme row */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { scrollbar-width: none; }
       `}</style>
     </div>
   )
