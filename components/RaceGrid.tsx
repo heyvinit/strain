@@ -411,10 +411,14 @@ export default function RaceGrid({
   labelColor?: string
   addRaceHref?: string
 }) {
-  const today = new Date().toISOString().split('T')[0]
   const upcoming = races
-    .filter(r => r.status === 'upcoming' && r.race_date && r.race_date >= today)
-    .sort((a, b) => (a.race_date! > b.race_date! ? 1 : -1))
+    .filter(r => r.status === 'upcoming')
+    .sort((a, b) => {
+      if (!a.race_date && !b.race_date) return 0
+      if (!a.race_date) return 1   // no date → bottom
+      if (!b.race_date) return -1  // no date → bottom
+      return a.race_date > b.race_date ? 1 : -1  // soonest first
+    })
   const past = races
     .filter(r => r.status === 'completed')
     .sort((a, b) => {
