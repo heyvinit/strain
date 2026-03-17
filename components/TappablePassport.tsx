@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sparkles } from 'lucide-react'
+import { WandSparkles } from 'lucide-react'
 import PassportCard from './PassportCard'
 import type { PassportStats } from './PassportCard'
 import type { DbUser } from '@/lib/supabase'
@@ -85,7 +85,7 @@ export default function TappablePassport({
             transition: 'opacity 0.18s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
           }}
         >
-          <Sparkles size={13} />
+          <WandSparkles size={13} />
           Customize style
         </button>
       </div>
