@@ -170,7 +170,7 @@ export default function RacePhotoGallery({
               sizes="(max-width: 640px) 30vw, 120px"
               style={{ objectFit: 'cover' }}
             />
-            {photo.is_thumbnail && (
+            {photo.is_thumbnail && !readOnly && (
               <div
                 style={{
                   position: 'absolute',

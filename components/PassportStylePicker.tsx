@@ -21,7 +21,6 @@ function TextureSwatch({ textureKey, selected, onSelect }: {
   onSelect: () => void
 }) {
   const t = PASSPORT_TEXTURES[textureKey]
-  const bg = t.pattern ? `${t.pattern}, #1a1a1a` : '#1a1a1a'
 
   return (
     <button
@@ -31,7 +30,7 @@ function TextureSwatch({ textureKey, selected, onSelect }: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 7,
+        gap: 6,
         background: 'none',
         border: 'none',
         padding: 0,
@@ -40,26 +39,27 @@ function TextureSwatch({ textureKey, selected, onSelect }: {
     >
       <div
         style={{
-          width: 68,
-          height: 68,
-          borderRadius: 16,
-          backgroundImage: bg,
+          width: 54,
+          height: 54,
+          borderRadius: 18,
+          backgroundColor: '#1c1c1c',
+          backgroundImage: t.pattern || undefined,
           boxShadow: selected
             ? '0 0 0 2.5px #FC4C02, 0 4px 12px rgba(0,0,0,0.15)'
             : '0 2px 8px rgba(0,0,0,0.1)',
-          border: selected ? 'none' : '1.5px solid #ECECEA',
+          border: selected ? 'none' : '1.5px solid #E0E0DE',
           transition: 'box-shadow 0.18s ease',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
         {selected && (
-          <div style={{ position: 'absolute', bottom: 5, right: 5, width: 16, height: 16, borderRadius: '50%', background: '#FC4C02', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Check size={9} color="white" strokeWidth={3} />
+          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 14, height: 14, borderRadius: '50%', background: '#FC4C02', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Check size={8} color="white" strokeWidth={3} />
           </div>
         )}
       </div>
-      <span style={{ fontSize: 11, fontWeight: selected ? 700 : 500, color: selected ? '#111' : '#888', transition: 'color 0.15s' }}>
+      <span style={{ fontSize: 10, fontWeight: selected ? 700 : 500, color: selected ? '#111' : '#888', transition: 'color 0.15s' }}>
         {t.name}
       </span>
     </button>
@@ -92,9 +92,9 @@ function ColorSwatch({ colorKey, selected, onSelect }: {
     >
       <div
         style={{
-          width: 68,
-          height: 68,
-          borderRadius: 16,
+          width: 54,
+          height: 54,
+          borderRadius: 18,
           backgroundImage: c.gradient,
           boxShadow: selected
             ? `0 0 0 2.5px ${c.accent}, 0 4px 12px rgba(0,0,0,0.2)`
@@ -104,15 +104,15 @@ function ColorSwatch({ colorKey, selected, onSelect }: {
           overflow: 'hidden',
         }}
       >
-        {/* Accent dot */}
+        {/* Accent stripe */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: c.accent }} />
         {selected && (
-          <div style={{ position: 'absolute', bottom: 5, right: 5, width: 16, height: 16, borderRadius: '50%', background: c.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Check size={9} color="white" strokeWidth={3} />
+          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 14, height: 14, borderRadius: '50%', background: c.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Check size={8} color="white" strokeWidth={3} />
           </div>
         )}
       </div>
-      <span style={{ fontSize: 11, fontWeight: selected ? 700 : 500, color: selected ? '#111' : '#888', transition: 'color 0.15s' }}>
+      <span style={{ fontSize: 10, fontWeight: selected ? 700 : 500, color: selected ? '#111' : '#888', transition: 'color 0.15s' }}>
         {c.name}
       </span>
     </button>
@@ -128,7 +128,10 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
         display: 'flex',
         gap: 12,
         overflowX: 'auto',
-        paddingBottom: 4,
+        paddingBottom: 6,
+        paddingTop: 4,
+        paddingLeft: 4,
+        paddingRight: 4,
         scrollSnapType: 'x mandatory',
         WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'],
       }}
