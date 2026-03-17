@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import type { DbUserRace } from '@/lib/supabase'
@@ -104,6 +105,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (error) return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
 
   await recalcPBs(owner.userId)
+  revalidatePath('/dashboard')
   return NextResponse.json({ success: true, race: data })
 }
 
@@ -123,5 +125,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (error) return NextResponse.json({ error: 'Failed to delete' }, { status: 500 })
 
   await recalcPBs(owner.userId)
+  revalidatePath('/dashboard')
   return NextResponse.json({ success: true })
 }

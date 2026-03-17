@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { recalcPBs } from '@/lib/pb'
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
   }
 
   await recalcPBs(session.user.userId)
+  revalidatePath('/dashboard')
 
   return NextResponse.json({ success: true, race })
 }
