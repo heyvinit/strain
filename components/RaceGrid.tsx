@@ -21,6 +21,43 @@ function cardThumbSrc(url: string): string {
   return url
 }
 
+// ─── Fallback branded images ──────────────────────────────────────────────────
+
+/** How many fallback images exist per category (update as images are added) */
+const FALLBACK_COUNTS: Record<string, number> = {
+  hyrox: 6,
+  // marathon: 5,
+  // 'half-marathon': 5,
+  // '10k': 5,
+  // '5k': 5,
+  // other: 5,
+}
+
+function getFallbackCategory(race: DbUserRace): string {
+  if (race.sport === 'hyrox') return 'hyrox'
+  const d = (race.distance ?? '').toLowerCase()
+  if (d.includes('42') || (d.includes('marathon') && !d.includes('half'))) return 'marathon'
+  if (d.includes('21') || d.includes('half')) return 'half-marathon'
+  if (d.includes('10')) return '10k'
+  if (d.includes('5')) return '5k'
+  return 'other'
+}
+
+function deterministicIndex(id: string, max: number): number {
+  let h = 0
+  for (let i = 0; i < id.length; i++) {
+    h = (Math.imul(31, h) + id.charCodeAt(i)) | 0
+  }
+  return (Math.abs(h) % max) + 1
+}
+
+function getFallbackImage(race: DbUserRace): string | null {
+  const category = getFallbackCategory(race)
+  const count = FALLBACK_COUNTS[category]
+  if (!count) return null
+  return `/race-fallbacks/${category}/${deterministicIndex(race.id, count)}.jpg`
+}
+
 // ─── Category gradients ────────────────────────────────────────────────────────
 
 const SPORT_GRADIENTS: Record<string, string> = {
@@ -60,6 +97,7 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
   const gradient = SPORT_GRADIENTS[race.sport] ?? SPORT_GRADIENTS.other
   const icon = SPORT_ICONS[race.sport] ?? '🏅'
   const isUpcoming = race.status === 'upcoming'
+  const fallbackSrc = !race.photo_url ? getFallbackImage(race) : null
 
   const inner = (
     <div
@@ -71,7 +109,7 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
         background: gradient,
       }}
     >
-      {/* Race photo — shown when user has uploaded one */}
+      {/* User's own photo */}
       {race.photo_url && (
         <Image
           src={cardThumbSrc(race.photo_url)}
@@ -82,8 +120,19 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
         />
       )}
 
-      {/* Sport icon watermark — only shown when no photo */}
-      {!race.photo_url && (
+      {/* Branded fallback image (when no user photo but category has assets) */}
+      {fallbackSrc && (
+        <Image
+          src={fallbackSrc}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 45vw, 200px"
+          style={{ objectFit: 'cover' }}
+        />
+      )}
+
+      {/* Sport icon watermark — only when no photo AND no fallback */}
+      {!race.photo_url && !fallbackSrc && (
         <div
           style={{
             position: 'absolute',
@@ -150,8 +199,8 @@ function RaceCard({ race, href }: { race: DbUserRace; href?: string }) {
         )}
       </div>
 
-      {/* No-photo nudge for past races */}
-      {!race.photo_url && !isUpcoming && (
+      {/* No-photo nudge — only when no fallback available */}
+      {!race.photo_url && !fallbackSrc && !isUpcoming && (
         <div
           style={{
             position: 'absolute',
