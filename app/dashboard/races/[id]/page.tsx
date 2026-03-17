@@ -174,6 +174,11 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
               bibNumber: race.bib_number,
               country: race.country,
               sport: race.sport,
+              netTime: race.net_time,
+              pace: race.pace,
+              overallPosition: race.overall_position,
+              categoryPosition: race.category_position,
+              category: race.category,
             }}
           />
         </div>

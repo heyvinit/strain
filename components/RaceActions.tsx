@@ -88,6 +88,11 @@ export interface RaceActionsProps {
     bibNumber: string | null
     country: string | null
     sport: string
+    netTime?: string | null
+    pace?: string | null
+    overallPosition?: string | null
+    categoryPosition?: string | null
+    category?: string | null
   }
 }
 
@@ -98,7 +103,7 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  // ── Edit state (upcoming only) ────────────────────────────────────────────────
+  // ── Edit state ────────────────────────────────────────────────────────────────
   const [editing, setEditing] = useState(false)
   const [editSport, setEditSport] = useState<SportKey>((race?.sport as SportKey) ?? 'running')
   const [form, setForm] = useState({
@@ -108,6 +113,11 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
     distanceCustom: '',
     bibNumber: race?.bibNumber ?? '',
     country: race?.country ?? '',
+    netTime: race?.netTime ?? '',
+    pace: race?.pace ?? '',
+    overallPosition: race?.overallPosition ?? '',
+    categoryPosition: race?.categoryPosition ?? '',
+    category: race?.category ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -138,6 +148,11 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
         distance,
         bibNumber: form.bibNumber,
         country: form.country,
+        netTime: form.netTime || null,
+        pace: form.pace || null,
+        overallPosition: form.overallPosition || null,
+        categoryPosition: form.categoryPosition || null,
+        category: form.category || null,
       }),
     })
     const json = await res.json()
@@ -176,9 +191,9 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
     )
   }
 
-  // ── Edit form (upcoming only) ──────────────────────────────────────────────────
+  // ── Edit form ──────────────────────────────────────────────────────────────────
 
-  if (editing && status === 'upcoming') {
+  if (editing) {
     const distanceOptions = SPORT_DISTANCES[editSport]
     return (
       <form onSubmit={handleSave}>
@@ -246,6 +261,20 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
 
           <Field label="BIB number" value={form.bibNumber ?? ''} onChange={v => setForm(f => ({ ...f, bibNumber: v }))} placeholder="e.g. 4521" optional />
           <Field label="Country" value={form.country ?? ''} onChange={v => setForm(f => ({ ...f, country: v }))} placeholder="e.g. India, UAE, USA" optional />
+
+          {status === 'completed' && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Finish time" value={form.netTime ?? ''} onChange={v => setForm(f => ({ ...f, netTime: v }))} placeholder="e.g. 3:45:00" optional />
+                <Field label="Pace" value={form.pace ?? ''} onChange={v => setForm(f => ({ ...f, pace: v }))} placeholder="e.g. 5:20/km" optional />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Overall position" value={form.overallPosition ?? ''} onChange={v => setForm(f => ({ ...f, overallPosition: v }))} placeholder="e.g. 142" optional />
+                <Field label="Category position" value={form.categoryPosition ?? ''} onChange={v => setForm(f => ({ ...f, categoryPosition: v }))} placeholder="e.g. 12" optional />
+              </div>
+              <Field label="Category" value={form.category ?? ''} onChange={v => setForm(f => ({ ...f, category: v }))} placeholder="e.g. M35-39" optional />
+            </>
+          )}
         </div>
 
         {saveError && <p className="text-sm mb-3 px-1" style={{ color: '#EF4444' }}>{saveError}</p>}
@@ -277,29 +306,26 @@ export default function RaceActions({ raceId, status, race }: RaceActionsProps) 
 
   return (
     <div className="flex gap-2">
-      {status === 'upcoming' && (
-        <button
-          onClick={() => setEditing(true)}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium active:scale-[0.98] transition-transform"
-          style={{ color: '#111', background: 'white', border: '1px solid #F0F0EE' }}
-        >
-          <Pencil size={13} />
-          Edit race
-        </button>
-      )}
+      <button
+        onClick={() => setEditing(true)}
+        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium active:scale-[0.98] transition-transform"
+        style={{ color: '#111', background: 'white', border: '1px solid #F0F0EE' }}
+      >
+        <Pencil size={13} />
+        Edit race
+      </button>
       <button
         onClick={() => setConfirming(true)}
         className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium active:scale-[0.98] transition-transform"
         style={{
           color: '#aaa',
           background: 'transparent',
-          flex: status === 'upcoming' ? '0 0 auto' : '1 1 auto',
-          paddingLeft: status === 'upcoming' ? 16 : undefined,
-          paddingRight: status === 'upcoming' ? 16 : undefined,
+          flex: '0 0 auto',
+          paddingLeft: 16,
+          paddingRight: 16,
         }}
       >
         <Trash2 size={13} />
-        {status !== 'upcoming' && 'Remove race'}
       </button>
     </div>
   )

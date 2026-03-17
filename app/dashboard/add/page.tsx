@@ -652,24 +652,56 @@ export default function AddRacePage() {
 
               {urlStep === 'preview' && preview && (
                 <div>
-                  <div className="rounded-3xl p-5 mb-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
-                    <p className="text-xs font-semibold mb-4 tracking-wider uppercase" style={{ color: '#888' }}>
+                  <div className="rounded-3xl p-5 mb-4 flex flex-col gap-4" style={{ background: 'white', border: '1px solid #F0F0EE' }}>
+                    <p className="text-xs font-semibold tracking-wider uppercase" style={{ color: '#888' }}>
                       Confirm your result
                     </p>
-                    <p className="text-xl font-bold mb-1" style={{ color: '#111' }}>{preview.raceName}</p>
-                    <p className="text-sm mb-5" style={{ color: '#888' }}>{preview.raceDate}</p>
+
+                    {/* Race name — editable */}
+                    <div>
+                      <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#aaa' }}>Race name</label>
+                      <input
+                        value={preview.raceName}
+                        onChange={e => setPreview(p => ({ ...p!, raceName: e.target.value }))}
+                        className="w-full rounded-2xl px-4 py-3 text-sm font-semibold outline-none"
+                        style={{ background: '#F8F8F7', color: '#111', border: '1px solid #ECECEA' }}
+                      />
+                    </div>
+
+                    {/* Date — editable */}
+                    <div>
+                      <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#aaa' }}>Race date</label>
+                      <input
+                        type="date"
+                        value={preview.raceDate}
+                        onChange={e => setPreview(p => ({ ...p!, raceDate: e.target.value }))}
+                        className="w-full rounded-2xl px-4 py-3 text-sm outline-none"
+                        style={{ background: '#F8F8F7', color: '#111', border: '1px solid #ECECEA' }}
+                      />
+                    </div>
+
+                    {/* Distance + Finish time — editable */}
                     <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Distance', value: preview.distance },
-                        { label: 'Finish time', value: preview.netTime },
-                        { label: 'Pace', value: preview.pace ?? '—' },
-                        { label: 'Overall', value: preview.overallPosition ?? '—' },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="rounded-2xl p-3" style={{ background: '#F8F8F7' }}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: '#aaa' }}>{label}</p>
-                          <p className="text-sm font-semibold truncate" style={{ color: '#111' }}>{value}</p>
-                        </div>
-                      ))}
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#aaa' }}>Distance</label>
+                        <input
+                          value={preview.distance}
+                          onChange={e => setPreview(p => ({ ...p!, distance: e.target.value }))}
+                          placeholder="e.g. 21.1km"
+                          className="w-full rounded-2xl px-3 py-3 text-sm font-semibold outline-none"
+                          style={{ background: '#F8F8F7', color: '#111', border: '1px solid #ECECEA' }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#aaa' }}>Finish time</label>
+                        <input
+                          value={preview.netTime}
+                          onChange={e => setPreview(p => ({ ...p!, netTime: e.target.value }))}
+                          placeholder="e.g. 1:42:34"
+                          className="w-full rounded-2xl px-3 py-3 text-sm font-semibold outline-none"
+                          style={{ background: '#F8F8F7', color: '#111', border: '1px solid #ECECEA' }}
+                        />
+                      </div>
                     </div>
                   </div>
                   <button
