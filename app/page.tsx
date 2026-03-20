@@ -77,7 +77,7 @@ export default async function LandingPage() {
 
       {/* Built by line */}
       <div className="relative z-10 mt-4 flex items-center justify-center gap-1.5" style={{ fontFamily: 'var(--font-grotesk)', letterSpacing: '0.02em' }}>
-        <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>Built with love by a late-for-a-athlete 🏃 ·</span>
+        <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>Built with love for athletes by athletes 🏃 ·</span>
         <a
           href="https://www.instagram.com/hey.vinit?igsh=aG96NDJpamowcnEw&utm_source=qr"
           target="_blank"

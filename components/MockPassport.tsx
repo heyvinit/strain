@@ -68,7 +68,7 @@ export default function MockPassport() {
         overflow: 'hidden',
         cursor: 'default',
         userSelect: 'none',
-        background: 'radial-gradient(ellipse at 18% 0%, #232323 0%, #0e0e0e 55%, #161616 100%)',
+        background: 'radial-gradient(ellipse at 18% 0%, #1e1a2e 0%, #110f1a 55%, #16132a 100%)',
         willChange: 'transform',
       }}
     >
@@ -76,7 +76,7 @@ export default function MockPassport() {
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-0.5" style={{ color: '#FC4C02' }}>
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-0.5" style={{ color: '#a78bfa' }}>
               Athlete Passport
             </p>
             <p className="text-[10px] tracking-widest uppercase" style={{ color: '#444' }}>
@@ -122,7 +122,7 @@ export default function MockPassport() {
                   style={{
                     width: 18, height: 18,
                     background: 'rgba(255,255,255,0.06)',
-                    border: '1.5px solid #0e0e0e',
+                    border: '1.5px solid #110f1a',
                     marginLeft: i > 0 ? -4 : 0,
                     fontSize: 11, lineHeight: 1,
                     zIndex: FLAGS.length - i,
@@ -137,7 +137,7 @@ export default function MockPassport() {
                 style={{
                   width: 18, height: 18,
                   background: 'rgba(255,255,255,0.08)',
-                  border: '1.5px solid #0e0e0e',
+                  border: '1.5px solid #110f1a',
                   marginLeft: -4,
                   color: '#888',
                   position: 'relative',
@@ -167,7 +167,7 @@ export default function MockPassport() {
       </div>
 
       {/* MRZ */}
-      <div className="px-5 py-3 overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', borderTop: '1px solid #1e1e1e' }}>
+      <div className="px-5 py-3 overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', borderTop: '1px solid #1e1a2e' }}>
         <p className="font-mono text-[9px] tracking-[0.12em] whitespace-nowrap overflow-hidden" style={{ color: '#2d2d2d' }}>
           {MRZ}
         </p>
