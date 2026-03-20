@@ -76,9 +76,19 @@ export default async function LandingPage() {
       </div>
 
       {/* Built by line */}
-      <p className="relative z-10 mt-4 text-center" style={{ color: 'rgba(255,255,255,0.18)', fontSize: 11, fontFamily: 'var(--font-grotesk)', letterSpacing: '0.02em' }}>
-        Built with love by a late-for-a-athlete 🏃
-      </p>
+      <div className="relative z-10 mt-4 flex items-center justify-center gap-1.5" style={{ fontFamily: 'var(--font-grotesk)', letterSpacing: '0.02em' }}>
+        <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>Built with love by a late-for-a-athlete 🏃 ·</span>
+        <a
+          href="https://www.instagram.com/hey.vinit?igsh=aG96NDJpamowcnEw&utm_source=qr"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 transition-opacity hover:opacity-80"
+          style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, textDecoration: 'none' }}
+        >
+          <img src="/vinit.jpg" alt="Vinit" style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.75 }} />
+          <span>hey.vinit</span>
+        </a>
+      </div>
     </main>
   )
 }
