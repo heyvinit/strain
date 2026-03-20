@@ -74,6 +74,11 @@ export default async function LandingPage() {
         <span>·</span>
         <Link href="/terms" className="underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms of Service</Link>
       </div>
+
+      {/* Built by line */}
+      <p className="relative z-10 mt-4 text-center" style={{ color: 'rgba(255,255,255,0.18)', fontSize: 11, fontFamily: 'var(--font-grotesk)', letterSpacing: '0.02em' }}>
+        Built with love by a late-for-a-athlete 🏃
+      </p>
     </main>
   )
 }
