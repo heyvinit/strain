@@ -51,6 +51,33 @@ CREATE TABLE IF NOT EXISTS user_races (
 CREATE INDEX IF NOT EXISTS idx_user_races_user_id ON user_races(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_races_status  ON user_races(status);
 
+-- ─── Run Clubs ────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS run_clubs (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  city        TEXT,
+  link        TEXT,
+  slug        TEXT UNIQUE NOT NULL,
+  created_by  UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_run_clubs_slug ON run_clubs(slug);
+
+CREATE TABLE IF NOT EXISTS run_club_members (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  club_id    UUID REFERENCES run_clubs(id) ON DELETE CASCADE NOT NULL,
+  user_id    UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  role       TEXT DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  status     TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved')),
+  joined_at  TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (club_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_run_club_members_user_id ON run_club_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_run_club_members_club_id ON run_club_members(club_id);
+
 -- ─── Row Level Security ───────────────────────────────────────────────────────
 -- We use the service role key on the server so RLS is a safety net only.
 

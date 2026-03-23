@@ -12,11 +12,13 @@ export default function TappablePassport({
   stats,
   username,
   qrSvg,
+  runClub,
 }: {
   user: DbUser
   stats: PassportStats
   username: string
   qrSvg?: string
+  runClub?: { name: string; slug: string } | null
 }) {
   const [tapped, setTapped] = useState(false)
   const router = useRouter()
@@ -50,7 +52,7 @@ export default function TappablePassport({
           WebkitTapHighlightColor: 'transparent',
         }}
       >
-        <PassportCard user={user} stats={stats} username={username} isOwner qrSvg={qrSvg} />
+        <PassportCard user={user} stats={stats} username={username} isOwner qrSvg={qrSvg} runClub={runClub} />
       </div>
 
       {/* Customize pill — height animates so it takes zero space when hidden */}

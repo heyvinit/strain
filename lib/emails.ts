@@ -137,3 +137,41 @@ export async function sendPostRaceEmail({
     html,
   })
 }
+
+// ─── Club join request email (to admin) ───────────────────────────────────────
+
+export async function sendClubJoinRequestEmail({
+  to, adminName, requesterName, requesterUsername, clubName, clubSlug,
+}: {
+  to: string
+  adminName: string
+  requesterName: string
+  requesterUsername: string
+  clubName: string
+  clubSlug: string
+}) {
+  const resend = getResendClient()
+  const firstName = adminName.split(' ')[0]
+  const approveUrl = `${BASE_URL}/club/${clubSlug}/manage`
+
+  const html = base(`
+    <p style="${styles.label}">New join request</p>
+    <h1 style="${styles.h1}">Someone wants to join ${clubName}</h1>
+    <hr style="${styles.divider}"/>
+    <p style="${styles.p}">
+      Hey ${firstName}, <strong style="color:#111;">${requesterName}</strong> (@${requesterUsername})
+      has requested to join <strong style="color:#111;">${clubName}</strong> on Strain.
+    </p>
+    <a href="${approveUrl}" style="${styles.cta}">Review request →</a>
+    <p style="font-size:13px;color:#bbb;margin-top:20px;">
+      You're the admin of ${clubName}. Only you can approve or decline this request.
+    </p>
+  `)
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${requesterName} wants to join ${clubName} on Strain`,
+    html,
+  })
+}

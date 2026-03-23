@@ -174,6 +174,7 @@ export default function PassportCard({
   isOwner = false,
   qrSvg,
   theme: themeProp,
+  runClub,
 }: {
   user: DbUser
   stats: PassportStats
@@ -181,6 +182,7 @@ export default function PassportCard({
   isOwner?: boolean
   qrSvg?: string
   theme?: PassportTheme
+  runClub?: { name: string; slug: string } | null
 }) {
   const theme = themeProp ?? resolveUserTheme(user.passport_theme)
   const PB_SLOTS = [
@@ -260,6 +262,11 @@ export default function PassportCard({
           <div>
             <p className="font-bold text-white text-lg leading-tight">{user.name}</p>
             <p className="text-xs" style={{ color: '#555' }}>@{username}</p>
+            {runClub && (
+              <p className="text-[10px] font-semibold mt-1 tracking-wide" style={{ color: theme.accent }}>
+                🏃 {runClub.name}
+              </p>
+            )}
           </div>
         </div>
 

@@ -30,6 +30,25 @@ export interface DbUser {
   created_at: string
 }
 
+export interface DbRunClub {
+  id: string
+  name: string
+  city: string | null
+  link: string | null
+  slug: string
+  created_by: string | null
+  created_at: string
+}
+
+export interface DbRunClubMember {
+  id: string
+  club_id: string
+  user_id: string
+  role: 'admin' | 'member'
+  status: 'pending' | 'approved'
+  joined_at: string
+}
+
 export type SportType = 'running' | 'hyrox' | 'triathlon' | 'ocr' | 'cycling' | 'other'
 
 export interface DbRacePhoto {
