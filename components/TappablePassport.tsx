@@ -18,7 +18,7 @@ export default function TappablePassport({
   stats: PassportStats
   username: string
   qrSvg?: string
-  runClub?: { name: string; slug: string } | null
+  runClub?: { name: string } | null
 }) {
   const [tapped, setTapped] = useState(false)
   const router = useRouter()

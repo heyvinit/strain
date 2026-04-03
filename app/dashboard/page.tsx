@@ -15,14 +15,13 @@ export default async function DashboardPage() {
   const userId = session!.user.userId
   const username = session!.user.username
 
-  const [{ data: user }, { data: races }, qrSvg, { data: clubMember }] = await Promise.all([
+  const [{ data: user }, { data: races }, qrSvg] = await Promise.all([
     supabaseAdmin.from('users').select('*').eq('id', userId).single<DbUser>(),
     supabaseAdmin.from('user_races').select('*').eq('user_id', userId).order('race_date', { ascending: false }),
     qrToSvg(`https://getstrain.app/${username}`),
-    supabaseAdmin.from('run_club_members').select('status, run_clubs(name, slug)').eq('user_id', userId).eq('status', 'approved').single(),
   ])
 
-  const runClub = clubMember ? (clubMember.run_clubs as any) : null
+  const runClub = user?.club_name ? { name: user.club_name } : null
 
   const allRaces: DbUserRace[] = races ?? []
   const stats = computePassportStats(allRaces)

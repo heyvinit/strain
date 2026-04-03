@@ -4,31 +4,20 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import ProfileSettings from '@/components/ProfileSettings'
-import RunClubSection from '@/components/RunClubSection'
+import ClubNameInput from '@/components/ClubNameInput'
 
 export default async function ProfilePage() {
   const session = await auth()
   if (!session?.user) redirect('/login')
   const userId = session.user.userId
 
-  const [{ data: user }, { data: memberRow }] = await Promise.all([
-    supabaseAdmin
-      .from('users')
-      .select('name, username, avatar_url, email, email_pre_race, email_post_race')
-      .eq('id', userId)
-      .single(),
-    supabaseAdmin
-      .from('run_club_members')
-      .select('role, status, run_clubs(id, name, city, slug)')
-      .eq('user_id', userId)
-      .single(),
-  ])
+  const { data: user } = await supabaseAdmin
+    .from('users')
+    .select('name, username, avatar_url, email, email_pre_race, email_post_race, club_name')
+    .eq('id', userId)
+    .single()
 
   if (!user) redirect('/dashboard')
-
-  const membership = memberRow
-    ? { role: memberRow.role as 'admin' | 'member', status: memberRow.status as 'pending' | 'approved', club: memberRow.run_clubs as any }
-    : null
 
   return (
     <div className="min-h-screen px-5 pt-14 pb-8">
@@ -54,7 +43,7 @@ export default async function ProfilePage() {
       />
 
       <div className="mt-4">
-        <RunClubSection initialMembership={membership} />
+        <ClubNameInput initialClubName={user.club_name ?? null} />
       </div>
     </div>
   )

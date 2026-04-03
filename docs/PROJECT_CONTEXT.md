@@ -1,6 +1,6 @@
 # Strain Project Context
 
-Last updated: 2026-03-09
+Last updated: 2026-04-03
 
 ## Source of truth
 - Codebase: `/Users/vinitghelani/racecard`
@@ -25,14 +25,16 @@ Longer-term ideas discussed:
 - Landing page + login flow + legal pages.
 - Public-facing passport view iteration.
 - Email/cron-related functionality for race reminders and follow-ups.
-- Deployment + domain flow on Vercel (`getstrain.app` / `strain-lyart.vercel.app` context discussed in prior sessions).
+- Deployment + domain flow on Vercel (`getstrain.app`).
+- Run club: simplified to a free-text `club_name` field on the `users` table. Users type their club name on the profile page, it shows on the passport (no emoji). No verification or club management — GTM phase, just showing the name.
+- Passport style customization (themes, textures, colors).
+- Branded fallback images for race cards (running, cycling, triathlon).
 
 ## Current product direction
+- Core GTM strategy: "Athlete Passport" as a shareable link for Instagram bios — instead of athletes cramming PBs into bio text, they share their Strain passport link.
+- Target: runners/triathletes/cyclists who actively post race results and PBs on social.
+- North star: completed passports shared externally (Instagram bio links, DMs, etc).
 - Keep current visual direction and continue feature expansion.
-- Prioritize high-value runner workflows:
-  - Passport completeness and trust.
-  - Better in-app editing and sharing experiences.
-  - Reliable auth and onboarding.
 - Add social/distribution features after core passport quality is strong.
 
 ## Important context from prior conversations

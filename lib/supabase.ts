@@ -27,6 +27,7 @@ export interface DbUser {
   email_pre_race: boolean
   email_post_race: boolean
   passport_theme: string | null
+  club_name: string | null
   created_at: string
 }
 

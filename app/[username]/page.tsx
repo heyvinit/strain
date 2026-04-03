@@ -49,15 +49,14 @@ export default async function PublicPassportPage({
 
   if (!user) notFound()
 
-  const [{ data: races }, qrSvg, { data: clubMember }] = await Promise.all([
+  const [{ data: races }, qrSvg] = await Promise.all([
     supabaseAdmin.from('user_races').select('*').eq('user_id', user.id).order('race_date', { ascending: false }),
     qrToSvg(`https://getstrain.app/${username}`),
-    supabaseAdmin.from('run_club_members').select('run_clubs(name, slug)').eq('user_id', user.id).eq('status', 'approved').single(),
   ])
 
   const allRaces: DbUserRace[] = races ?? []
   const stats = computePassportStats(allRaces)
-  const runClub = clubMember ? (clubMember.run_clubs as any) : null
+  const runClub = user.club_name ? { name: user.club_name } : null
 
   return (
     <main

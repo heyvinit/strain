@@ -1,33 +1,33 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// GET — current user's club membership
+// GET — current user's club name
 export async function GET() {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  const userId = session.user.userId
 
   const { data } = await supabaseAdmin
-    .from('run_club_members')
-    .select('role, status, run_clubs(id, name, city, slug)')
-    .eq('user_id', userId)
+    .from('users')
+    .select('club_name')
+    .eq('id', session.user.userId)
     .single()
 
-  if (!data) return NextResponse.json({ membership: null })
-  return NextResponse.json({ membership: { role: data.role, status: data.status, club: data.run_clubs } })
+  return NextResponse.json({ club_name: data?.club_name ?? null })
 }
 
-// DELETE — leave club
-export async function DELETE() {
+// PATCH — save club name
+export async function PATCH(req: NextRequest) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  const userId = session.user.userId
 
-  await supabaseAdmin
-    .from('run_club_members')
-    .delete()
-    .eq('user_id', userId)
+  const { club_name } = await req.json()
 
+  const { error } = await supabaseAdmin
+    .from('users')
+    .update({ club_name: club_name?.trim() || null })
+    .eq('id', session.user.userId)
+
+  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }
