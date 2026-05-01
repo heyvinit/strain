@@ -126,8 +126,8 @@ export default function PrivacyPage() {
           <Section title="Contact">
             <p>
               Questions about this policy or want your data deleted? Email us at{' '}
-              <a href="mailto:hello@getstrain.app" className="font-medium underline underline-offset-2" style={{ color: '#FC4C02' }}>
-                hello@getstrain.app
+              <a href="mailto:hello@myrace.fyi" className="font-medium underline underline-offset-2" style={{ color: '#FC4C02' }}>
+                hello@myrace.fyi
               </a>
             </p>
           </Section>

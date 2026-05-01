@@ -25,7 +25,7 @@ export default function TermsPage() {
         >
           <Section title="What Strain is">
             <p>
-              Strain (getstrain.app) is an athlete passport app built for runners and multi-sport
+              Strain (myrace.fyi) is an athlete passport app built for runners and multi-sport
               athletes. It lets you log races, track personal bests, and share your race history
               publicly. By using Strain, you agree to these terms.
             </p>
@@ -36,7 +36,7 @@ export default function TermsPage() {
               {[
                 'You must have a valid Strava account to sign in.',
                 'You are responsible for the accuracy of race data you add manually.',
-                'Your public profile (getstrain.app/username) is visible to anyone with the link.',
+                'Your public profile (myrace.fyi/username) is visible to anyone with the link.',
                 'You must not use Strain for any unlawful purpose.',
                 'You must not attempt to access other users\' private data.',
               ].map(item => (
@@ -58,7 +58,7 @@ export default function TermsPage() {
 
           <Section title="Public profiles">
             <p>
-              Your athlete passport at getstrain.app/username is publicly accessible by default.
+              Your athlete passport at myrace.fyi/username is publicly accessible by default.
               Anyone with the link can view your race history, personal bests, and countries.
               There is currently no option to make your profile private — if this is a concern,
               do not use Strain.
@@ -101,8 +101,8 @@ export default function TermsPage() {
           <Section title="Contact">
             <p>
               Questions about these terms? Email us at{' '}
-              <a href="mailto:hello@getstrain.app" className="font-medium underline underline-offset-2" style={{ color: '#FC4C02' }}>
-                hello@getstrain.app
+              <a href="mailto:hello@myrace.fyi" className="font-medium underline underline-offset-2" style={{ color: '#FC4C02' }}>
+                hello@myrace.fyi
               </a>
             </p>
           </Section>

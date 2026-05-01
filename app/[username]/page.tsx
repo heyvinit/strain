@@ -51,7 +51,7 @@ export default async function PublicPassportPage({
 
   const [{ data: races }, qrSvg] = await Promise.all([
     supabaseAdmin.from('user_races').select('*').eq('user_id', user.id).order('race_date', { ascending: false }),
-    qrToSvg(`https://getstrain.app/${username}`),
+    qrToSvg(`https://myrace.fyi/${username}`),
   ])
 
   const allRaces: DbUserRace[] = races ?? []

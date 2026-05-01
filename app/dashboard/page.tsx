@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   const [{ data: user }, { data: races }, qrSvg] = await Promise.all([
     supabaseAdmin.from('users').select('*').eq('id', userId).single<DbUser>(),
     supabaseAdmin.from('user_races').select('*').eq('user_id', userId).order('race_date', { ascending: false }),
-    qrToSvg(`https://getstrain.app/${username}`),
+    qrToSvg(`https://myrace.fyi/${username}`),
   ])
 
   const runClub = user?.club_name ? { name: user.club_name } : null

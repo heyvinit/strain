@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
-const FROM = 'hello@getstrain.app'
-const BASE_URL = 'https://getstrain.app'
+const FROM = 'hello@myrace.fyi'
+const BASE_URL = 'https://myrace.fyi'
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY
@@ -37,7 +37,7 @@ function base(content: string): string {
     ${content}
   </div>
   <p style="${styles.footer}">
-    Strain · <a href="${BASE_URL}" style="color:#bbb;">getstrain.app</a><br/>
+    Strain · <a href="${BASE_URL}" style="color:#bbb;">myrace.fyi</a><br/>
     You're receiving this because you have a race logged on Strain.
   </p>
 </div>

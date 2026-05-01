@@ -7,7 +7,7 @@ export default function FloatingShare({ username }: { username: string }) {
   const [copied, setCopied] = useState(false)
 
   async function handleShare() {
-    const url = `https://getstrain.app/${username}`
+    const url = `https://myrace.fyi/${username}`
 
     if (navigator.share) {
       try {
