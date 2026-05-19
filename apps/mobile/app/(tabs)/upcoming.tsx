@@ -22,7 +22,7 @@ export default function UpcomingScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <LocationHeader />
+        <LocationHeader onPressMap={() => router.push('/map')} />
         <View style={styles.toggleWrap}>
           <ModeToggle value={mode} onChange={setMode} />
         </View>
