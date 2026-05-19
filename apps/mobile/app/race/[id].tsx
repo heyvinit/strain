@@ -6,6 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAddedRaces } from '@/lib/addedRaces';
 import { mockRaces } from '@/lib/mockRaces';
 import { colors, fonts, layout, radii, type } from '@/lib/theme';
 
@@ -22,6 +23,25 @@ const INCLUDED = [
 export default function RaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const race = mockRaces.find((r) => r.id === id);
+  const { addRace, removeBySourceId, isSourceSaved } = useAddedRaces();
+  const saved = race ? isSourceSaved(race.id) : false;
+
+  const handleToggleSave = () => {
+    if (!race) return;
+    if (saved) {
+      removeBySourceId(race.id);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    } else {
+      addRace({
+        name: race.name,
+        distance: race.distanceLabel,
+        date: race.date,
+        city: race.city,
+        sourceRaceId: race.id,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    }
+  };
 
   if (!race) {
     return (
@@ -142,20 +162,35 @@ export default function RaceDetailScreen() {
       </ScrollView>
 
       <SafeAreaView edges={['bottom']} style={styles.ctaWrap}>
-        <Pressable
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-          }}
-          style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}>
-          <View style={styles.ctaLeft}>
-            <Text style={styles.ctaPriceLabel}>FROM</Text>
-            <Text style={styles.ctaPrice}>{race.priceFrom}</Text>
-          </View>
-          <View style={styles.ctaRight}>
-            <Text style={styles.ctaLabel}>Register</Text>
-            <Ionicons name="arrow-forward" size={16} color={colors.bg} />
-          </View>
-        </Pressable>
+        <View style={styles.ctaRow}>
+          <Pressable
+            onPress={handleToggleSave}
+            style={({ pressed }) => [
+              styles.saveBtn,
+              saved && styles.saveBtnActive,
+              pressed && { opacity: 0.9 },
+            ]}>
+            <Ionicons
+              name={saved ? 'bookmark' : 'bookmark-outline'}
+              size={20}
+              color={saved ? colors.accent : colors.ink}
+            />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+            }}
+            style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}>
+            <View style={styles.ctaLeft}>
+              <Text style={styles.ctaPriceLabel}>FROM</Text>
+              <Text style={styles.ctaPrice}>{race.priceFrom}</Text>
+            </View>
+            <View style={styles.ctaRight}>
+              <Text style={styles.ctaLabel}>Register</Text>
+              <Ionicons name="arrow-forward" size={16} color={colors.bg} />
+            </View>
+          </Pressable>
+        </View>
       </SafeAreaView>
     </View>
   );
@@ -340,7 +375,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
     paddingTop: 12,
   },
+  ctaRow: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+  },
+  saveBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: radii.xl,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.surfaceBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveBtnActive: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accentSoft,
+  },
   cta: {
+    flex: 1,
     height: 56,
     borderRadius: radii.xl,
     backgroundColor: colors.ink,

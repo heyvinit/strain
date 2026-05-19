@@ -8,7 +8,8 @@
     "dev:web": "pnpm --filter @strain/web dev",
     "dev:mobile": "pnpm --filter @strain/mobile start",
     "build:web": "pnpm --filter @strain/web build",
-    "lint:web": "pnpm --filter @strain/web lint"
+    "lint:web": "pnpm --filter @strain/web lint",
+    "lint": "expo lint"
   },
   "engines": {
     "node": ">=20"
