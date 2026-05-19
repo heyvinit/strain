@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { EmptyTile } from '@/components/home/EmptyTile';
@@ -5,8 +6,11 @@ import { FilterPills } from '@/components/home/FilterPills';
 import { FloatingSearchBar } from '@/components/home/FloatingSearchBar';
 import { GlobePreview } from '@/components/home/GlobePreview';
 import { RaceFeatureCard } from '@/components/home/RaceFeatureCard';
+import { RaceHeroCard } from '@/components/home/RaceHeroCard';
+import { RaceListRow } from '@/components/home/RaceListRow';
 import { SectionTitle } from '@/components/home/SectionTitle';
 import { SpotlightCard } from '@/components/home/SpotlightCard';
+import { mockRaces } from '@/lib/mockRaces';
 import { colors, layout } from '@/lib/theme';
 
 const SPOTLIGHT = [
@@ -20,7 +24,13 @@ const FEATURED = [
   { id: 'b', title: "L'Etap Dubai", date: '12 Jan 27', city: 'Dubai', distance: '1.8km, 20km, 67km, 112km', category: 'Road Cycling' },
 ];
 
+const HERO_RACES = mockRaces.slice(0, 3);
+const LIST_RACES = mockRaces.slice(3, 7);
+
 export function RacesView() {
+  const openRace = (id: string) =>
+    router.push({ pathname: '/race/[id]', params: { id } });
+
   return (
     <View>
       <GlobePreview />
@@ -34,10 +44,18 @@ export function RacesView() {
 
         <View style={styles.section}>
           <SectionTitle size={14}>Upcoming Races In UAE</SectionTitle>
-          <View style={styles.twoCol}>
-            <EmptyTile bordered width={188.77} height={192} />
-            <EmptyTile bordered width={189} height={192} />
-          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.heroRow}>
+            {HERO_RACES.map((race) => (
+              <RaceHeroCard
+                key={race.id}
+                race={race}
+                onPress={() => openRace(race.id)}
+              />
+            ))}
+          </ScrollView>
         </View>
       </View>
 
@@ -72,8 +90,16 @@ export function RacesView() {
           </View>
         </View>
 
-        <View style={[styles.section, { gap: 24 }]}>
-          <SectionTitle>Upcoming Races In UAE</SectionTitle>
+        <View style={[styles.section, { gap: 8 }]}>
+          <SectionTitle>More to explore</SectionTitle>
+          <View style={styles.listWrap}>
+            {LIST_RACES.map((race, i) => (
+              <View key={race.id}>
+                {i > 0 && <View style={styles.listDivider} />}
+                <RaceListRow race={race} onPress={() => openRace(race.id)} />
+              </View>
+            ))}
+          </View>
         </View>
       </View>
 
@@ -132,5 +158,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
     gap: 16,
     paddingBottom: 8,
+  },
+  heroRow: {
+    gap: 14,
+    paddingRight: 4,
+  },
+  listWrap: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.surfaceBorder,
+    paddingHorizontal: 14,
+  },
+  listDivider: {
+    height: 1,
+    backgroundColor: colors.hairline,
   },
 });

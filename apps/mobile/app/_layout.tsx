@@ -36,6 +36,10 @@ export default function RootLayout() {
         <ThemeProvider value={StrainDarkTheme}>
           <Stack screenOptions={{ contentStyle: { backgroundColor: colors.bg } }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="race/[id]"
+              options={{ headerShown: false, animation: 'slide_from_right' }}
+            />
           </Stack>
           {(!splashDone || !fontsLoaded) && (
             <SplashAnimator onComplete={() => setSplashDone(true)} />
