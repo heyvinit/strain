@@ -3,7 +3,7 @@
 Last updated: 2026-04-03
 
 ## Source of truth
-- Codebase: `/Users/vinitghelani/racecard`
+- Codebase: `/Users/vinitghelani/strain`
 - Claude session history used for this summary:
   - `/Users/vinitghelani/.claude/history.jsonl`
   - `/Users/vinitghelani/.claude/projects/-Users-vinitghelani/17d38983-851e-4f3a-b405-6fd66491d1ce.jsonl`
@@ -40,7 +40,7 @@ Longer-term ideas discussed:
 ## Important context from prior conversations
 - User preference: practical, step-by-step shipping over big rewrites.
 - User preference: preserve existing app design patterns unless intentionally changing a specific surface.
-- Product name is Strain; repo folder started as `racecard`.
+- Product name is Strain; repo folder is `strain` (renamed from `racecard` on 2026-05-11).
 - Strava integration has been a recurring strategic area, but can progress without waiting on it.
 
 ## Current engineering baseline (Codex verification on 2026-03-09)
