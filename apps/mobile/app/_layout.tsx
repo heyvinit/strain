@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
 import { SplashAnimator } from '@/components/SplashAnimator';
+import { AddedRacesProvider } from '@/lib/addedRaces';
 import { useAppFonts } from '@/lib/useAppFonts';
 import { colors } from '@/lib/theme';
 
@@ -34,17 +35,27 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>
       <BottomSheetModalProvider>
         <ThemeProvider value={StrainDarkTheme}>
-          <Stack screenOptions={{ contentStyle: { backgroundColor: colors.bg } }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="race/[id]"
-              options={{ headerShown: false, animation: 'slide_from_right' }}
-            />
-          </Stack>
-          {(!splashDone || !fontsLoaded) && (
-            <SplashAnimator onComplete={() => setSplashDone(true)} />
-          )}
-          <StatusBar style="light" />
+          <AddedRacesProvider>
+            <Stack screenOptions={{ contentStyle: { backgroundColor: colors.bg } }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="race/[id]"
+                options={{ headerShown: false, animation: 'slide_from_right' }}
+              />
+              <Stack.Screen
+                name="add-race"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
+              />
+            </Stack>
+            {(!splashDone || !fontsLoaded) && (
+              <SplashAnimator onComplete={() => setSplashDone(true)} />
+            )}
+            <StatusBar style="light" />
+          </AddedRacesProvider>
         </ThemeProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
